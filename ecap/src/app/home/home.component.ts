@@ -82,7 +82,6 @@ export class HomeComponent implements OnInit {
     });
   }
 
-
   isClockPositionSelected = false;
   updateClockPositionSelection(event: MatCheckboxChange) {
     this.isClockPositionSelected = event.checked;

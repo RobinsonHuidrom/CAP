@@ -138,8 +138,9 @@
    <ng-template matStepLabel>Done</ng-template>
       You are now done.
       <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button (click)="stepper.reset()">Reset</button>
+        <button  class="buttonColor"  mat-raised-button color="warn">Back</button>
+        <button  class="buttonColor" mat-raised-button color="primary">Reset</button>
+        <button  class="buttonColor" mat-raised-button color="accent">Submit</button>
       </div>
  </mat-step>
  
