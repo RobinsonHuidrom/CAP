@@ -1,0 +1,19 @@
+.example-container mat-form-field + mat-form-field {
+  margin-left: 8px;
+}
+
+.example-radio-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.spacing {
+ color: brown;
+}
+
+
+mat-divider {
+    margin : 15px 0 15px 0;
+  }
