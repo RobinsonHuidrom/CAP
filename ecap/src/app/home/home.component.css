@@ -17,6 +17,11 @@
   margin-right: 10px;
 }
 
+.example-full-width {
+  width: 100%;
+}
+
+
 mat-divider {
   margin : 15px 0 15px 0;
 }

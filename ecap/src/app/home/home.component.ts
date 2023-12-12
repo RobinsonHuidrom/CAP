@@ -9,6 +9,7 @@ import {MatCheckboxChange, MatCheckboxModule} from '@angular/material/checkbox';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatSelectModule} from '@angular/material/select';
 import {MatCardModule} from '@angular/material/card';
+import {MatListModule} from '@angular/material/list';
 import {CommonModule} from '@angular/common';
 
 @Component({
@@ -26,6 +27,7 @@ import {CommonModule} from '@angular/common';
     MatDividerModule,
     MatSelectModule,
     MatCardModule,
+    MatListModule,
     CommonModule
   ],
   templateUrl: './home.component.html',
@@ -34,13 +36,12 @@ import {CommonModule} from '@angular/common';
 
 export class HomeComponent implements OnInit {
 
-  checkedList: any[] = [];
+  isClockEnabled!: boolean;
   firstFormGroup!: FormGroup;
   secondFormGroup!: FormGroup;
   thirdFormGroup!: FormGroup;
-  isClockEnabled!: boolean;
 
-  constructor(private _formBuilder: FormBuilder) { }
+  constructor(private _formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
     this.initFirstFormGroup();
@@ -52,36 +53,56 @@ export class HomeComponent implements OnInit {
     this.firstFormGroup = this._formBuilder.group({
       name: [''],
       age: [''],
+      gender: [''],
       labNo: [''],
-      address: ['']
+      address: [''],
     });
   }
 
   private initSecondFormGroup(): void {
     this.secondFormGroup = this._formBuilder.group({
-      secondCtrl: ['']
+      procedure: [''],
+      comment: [''],
+      direction: [''],
     });
   }
 
   private initThirdFormGroup(): void {
-    const checkboxes = this.checklist();
-    const formArray = this._formBuilder.array(
-      checkboxes.map(checkbox => this._formBuilder.control(checkbox.isSelected))
-    );
-
-    this.thirdFormGroup = this._formBuilder.group({
-      clock: formArray,
-    });
-
-    formArray.valueChanges.subscribe((selectedAuthors) => {
-      const selectedAuthorNames = checkboxes
-        .filter((checkbox, index) => selectedAuthors[index])
-        .map(selectedAuthor => selectedAuthor.value);
   
-      console.log('Selected Clock Names:', selectedAuthorNames);
+    const tumorList = this.tumorlist();
+    const checkboxes = this.checklist();
+  
+    const tumorFormArray = this._formBuilder.array(
+      tumorList.map((tumor) => this._formBuilder.control(false))
+    );
+  
+    const clockFormArray = this._formBuilder.array(
+      checkboxes.map((checkbox) => this._formBuilder.control(false))
+    );
+  
+    this.thirdFormGroup = this._formBuilder.group({
+      tumorSites: tumorFormArray,
+      clock: clockFormArray,
+      distance: [''],
+      distance2: [''],
+    });
+  
+    // Subscribe to changes in both tumorSites and clock FormArrays
+    tumorFormArray.valueChanges.subscribe((selectedTumors) => {
+      const selectedTumorValues = tumorList
+        .filter((tumor, index) => selectedTumors[index])
+        .map((tumor) => tumor.value);
+      console.log('Selected Tumor Names:', selectedTumorValues);
+    });
+  
+    clockFormArray.valueChanges.subscribe((selectedClocks) => {
+      const selectedClockValues = checkboxes
+        .filter((checkbox, index) => selectedClocks[index])
+        .map((checkbox) => checkbox.value);
+      console.log('Selected Clock Names:', selectedClockValues);
     });
   }
-
+  
   isClockPositionSelected = false;
   updateClockPositionSelection(event: MatCheckboxChange) {
     this.isClockPositionSelected = event.checked;
@@ -89,11 +110,22 @@ export class HomeComponent implements OnInit {
 
   showOtherField: boolean = false;
   onRadioChange(event: MatRadioChange) {
-    if (event.value === '4') {
+    if (event.value === 'Other (specify)') {
       this.showOtherField = true;
     } else {
       this.showOtherField = false;
     }
+  }
+
+  tumorlist(): any[] {
+    return [ 
+      { id: 1, value: 'Upper outer quadrant', isSelected: false },
+      { id: 2, value: 'Lower outer quadrant', isSelected: false },
+      { id: 3, value: 'Upper inner quadrant', isSelected: false },
+      { id: 4, value: 'Lower inner quadrant', isSelected: false },
+      { id: 5, value: 'Central', isSelected: false },
+      { id: 6, value: 'Nipple', isSelected: false },
+    ];
   }
 
   checklist(): any[] {
@@ -109,8 +141,46 @@ export class HomeComponent implements OnInit {
       { id: 9, value: '9 o clock', isSelected: false },
       { id: 10, value: '10 o clock', isSelected: false },
       { id: 11, value: '11 o clock', isSelected: false },
-      { id: 12, value: '12 o clock', isSelected: false }
+      { id: 12, value: '12 o clock', isSelected: false },
     ];
   }
+
+  getPreviewValues(): string {
+    const firstStepValues = this.firstFormGroup.value;
+    const secondStepValues = this.secondFormGroup.value;
+    const thirdStepValues = this.thirdFormGroup.value;
+  
+    const selectedTumorValues = thirdStepValues.tumorSites
+    .map((isSelected: boolean, index: number) => isSelected ? this.tumorlist()[index].value : null)
+    .filter((value: string | null) => value !== null);
+  
+    const selectedClocks = thirdStepValues.clock
+    .map((isSelected: boolean, index: number) => isSelected ? this.checklist()[index].value : null)
+    .filter((value: string | null) => value !== null);
+  
+    const preview = `
+    Patient Details:
+    Name: ${firstStepValues.name}
+    Age: ${firstStepValues.age}
+    LAB Number: ${firstStepValues.labNo}
+    Gender:  ${firstStepValues.gender}
+    Address: ${firstStepValues.address}
+
+    Specimen:
+    Procedure: ${secondStepValues.procedure}
+    Comment: ${secondStepValues.comment}
+    Specimen Laterality: ${secondStepValues.direction}
+
+    Tumor:
+    Tumor Site:  ${selectedTumorValues.join(', ')}
+    Clock Position: ${selectedClocks.join(', ')}
+    Distance from Nipple: ${thirdStepValues.distance}
+    Other: ${thirdStepValues.distance2}
+  `;
+
+    return preview;
+  }
+
+
 
 }
