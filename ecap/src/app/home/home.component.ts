@@ -1,3 +1,4 @@
+
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -8,7 +9,6 @@ import {MatRadioChange, MatRadioModule} from '@angular/material/radio';
 import {MatCheckboxChange, MatCheckboxModule} from '@angular/material/checkbox';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatSelectModule} from '@angular/material/select';
-import {MatCardModule} from '@angular/material/card';
 import {MatListModule} from '@angular/material/list';
 import {CommonModule} from '@angular/common';
 
@@ -26,7 +26,6 @@ import {CommonModule} from '@angular/common';
     MatCheckboxModule,
     MatDividerModule,
     MatSelectModule,
-    MatCardModule,
     MatListModule,
     CommonModule
   ],
@@ -69,8 +68,8 @@ export class HomeComponent implements OnInit {
 
   private initThirdFormGroup(): void {
   
-    const tumorList = this.tumorlist();
-    const checkboxes = this.checklist();
+    const tumorList = this.fetchTumorList();
+    const checkboxes = this.fetchClockList();
   
     const tumorFormArray = this._formBuilder.array(
       tumorList.map((tumor) => this._formBuilder.control(false))
@@ -85,6 +84,8 @@ export class HomeComponent implements OnInit {
       clock: clockFormArray,
       distance: [''],
       distance2: [''],
+      clockRadio: [''],
+      tumorRadio: ['']
     });
   
     // Subscribe to changes in both tumorSites and clock FormArrays
@@ -108,6 +109,23 @@ export class HomeComponent implements OnInit {
     this.isClockPositionSelected = event.checked;
   }
 
+  resetAllControls(event: MatCheckboxChange) {
+    if (event.checked) {
+      const tumorRadioControl = this.thirdFormGroup.get('tumorRadio');
+  
+      if (tumorRadioControl) {
+        const tumorRadioValue = tumorRadioControl.value;
+        // Reset the entire form except for the tumorRadio control
+        this.thirdFormGroup.reset();
+        // Set the value back to the tumorRadio control
+        tumorRadioControl.setValue(tumorRadioValue, { emitEvent: false });
+      }
+    } else {
+      // Enable the entire thirdFormGroup
+      this.thirdFormGroup.enable({ emitEvent: false });
+    }
+  }
+  
   showOtherField: boolean = false;
   onRadioChange(event: MatRadioChange) {
     if (event.value === 'Other (specify)') {
@@ -117,7 +135,56 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  tumorlist(): any[] {
+  getPreviewValues(): string {
+    const firstStepValues = this.firstFormGroup.value;
+    const secondStepValues = this.secondFormGroup.value;
+    const thirdStepValues = this.thirdFormGroup.value;
+  
+    const selectedTumorValues = this.getSelectedValues(
+      thirdStepValues.tumorSites,
+      this.fetchTumorList()
+    );
+   
+    const selectedClocks = this.getSelectedValues(
+      thirdStepValues.clock,
+      this.fetchClockList()
+    );
+
+    const tumorRadioValue = thirdStepValues.tumorRadio;
+    const tumorSiteDisplayValue = tumorRadioValue ? 'Not Specified' : selectedTumorValues.join(', ');
+  
+    const preview = `
+      Patient Details:
+      Name: ${firstStepValues.name}
+      Age: ${firstStepValues.age}
+      LAB Number: ${firstStepValues.labNo}
+      Gender:  ${firstStepValues.gender}
+      Address: ${firstStepValues.address}
+  
+      Specimen:
+      Procedure: ${secondStepValues.procedure}
+      Comment: ${secondStepValues.comment}
+      Specimen Laterality: ${secondStepValues.direction}
+  
+      Tumor:
+      Tumor Site:  ${tumorSiteDisplayValue}
+      Clock Position: ${selectedClocks.join(', ')}
+      Distance from Nipple: ${thirdStepValues.distance}
+      Other: ${thirdStepValues.distance2}   
+    `;
+  
+    return preview;
+
+  }
+
+
+  private getSelectedValues(selectedItems: boolean[], itemList: any[]): string[] {
+    return selectedItems
+      .map((isSelected: boolean, index: number) => (isSelected ? itemList[index].value : null))
+      .filter((value: string | null) => value !== null);
+  }
+
+  fetchTumorList(): any[] {
     return [ 
       { id: 1, value: 'Upper outer quadrant', isSelected: false },
       { id: 2, value: 'Lower outer quadrant', isSelected: false },
@@ -128,7 +195,7 @@ export class HomeComponent implements OnInit {
     ];
   }
 
-  checklist(): any[] {
+  fetchClockList(): any[] {
     return [
       { id: 1, value: '1 o clock', isSelected: false },
       { id: 2, value: '2 o clock', isSelected: false },
@@ -144,43 +211,5 @@ export class HomeComponent implements OnInit {
       { id: 12, value: '12 o clock', isSelected: false },
     ];
   }
-
-  getPreviewValues(): string {
-    const firstStepValues = this.firstFormGroup.value;
-    const secondStepValues = this.secondFormGroup.value;
-    const thirdStepValues = this.thirdFormGroup.value;
-  
-    const selectedTumorValues = thirdStepValues.tumorSites
-    .map((isSelected: boolean, index: number) => isSelected ? this.tumorlist()[index].value : null)
-    .filter((value: string | null) => value !== null);
-  
-    const selectedClocks = thirdStepValues.clock
-    .map((isSelected: boolean, index: number) => isSelected ? this.checklist()[index].value : null)
-    .filter((value: string | null) => value !== null);
-  
-    const preview = `
-    Patient Details:
-    Name: ${firstStepValues.name}
-    Age: ${firstStepValues.age}
-    LAB Number: ${firstStepValues.labNo}
-    Gender:  ${firstStepValues.gender}
-    Address: ${firstStepValues.address}
-
-    Specimen:
-    Procedure: ${secondStepValues.procedure}
-    Comment: ${secondStepValues.comment}
-    Specimen Laterality: ${secondStepValues.direction}
-
-    Tumor:
-    Tumor Site:  ${selectedTumorValues.join(', ')}
-    Clock Position: ${selectedClocks.join(', ')}
-    Distance from Nipple: ${thirdStepValues.distance}
-    Other: ${thirdStepValues.distance2}
-  `;
-
-    return preview;
-  }
-
-
-
 }
+
