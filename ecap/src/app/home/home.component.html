@@ -113,7 +113,7 @@
 
    <div>
       <mat-label class="spacing">If not specified (tick here) : </mat-label>
-      <mat-checkbox  value="Not specified" formControlName="tumorRadio" (change)="resetAllControls($event)"> Not specified </mat-checkbox>
+      <mat-checkbox  value="Not specified" formControlName="tumorRadio" (change)="resetTumorValues($event)"> Not specified </mat-checkbox>
    </div>
 
    <mat-divider></mat-divider>
@@ -126,7 +126,136 @@
   
  </form>
 </mat-step>
+
+
+<mat-step [stepControl]="fourthFormGroup">
+  <form [formGroup]="fourthFormGroup">
+    <ng-template matStepLabel> Tumor Size </ng-template>
+
+    <mat-radio-group class="example-radio-group" (change)="onChange($event)" formControlName="tumorSize">
+      <mat-radio-button value="dimension">Enter dimension: </mat-radio-button>
+      <mat-radio-button value="Cannot be determined"> Cannot be determined (explain): </mat-radio-button>
+    </mat-radio-group>
+
+    <div *ngIf="showComment">
+      <mat-form-field class="example-full-width">
+        <mat-label>Enter here</mat-label>
+        <textarea matInput style="height: 130px;" formControlName="tumorSizeComment"></textarea>
+      </mat-form-field>
+    </div>
+
+    <div *ngIf="showDimension">
+      <mat-label class="spacing"> Greatest dimension in Millimeters (mm) : </mat-label>  
+        <mat-form-field >
+          <input type="number" matInput formControlName="dimension" >
+        </mat-form-field>
+      <br>
+      <mat-label class="spacing">Additional Dimension in Millimeters (format ____ x ____ mm) : </mat-label>  
+       <mat-form-field >
+          <input type="text" placeholder="Example: 34x45" matInput formControlName="dimension2" >
+       </mat-form-field>
+    </div>
+
+    <mat-divider></mat-divider>
+    
+  <div>
+    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperPrevious>Back</button>
+     &nbsp;
+    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperNext>Next</button>
+  </div>
+
+ </form>
+</mat-step>
+
+<mat-step [stepControl]="fifthFormGroup">
+  <form [formGroup]="fifthFormGroup">
+    <ng-template matStepLabel> Malignant phyllodes tumor diagnosis requirement </ng-template>
+
+  <div>
+    <h4>Histologic Type (Note A)</h4>
+    <mat-radio-group class="example-radio-group" aria-label="Select an option" formControlName="histologic">
+      <mat-radio-button value="benign"> Phyllodes tumor, benign </mat-radio-button>
+      <mat-radio-button value="borderline"> Phyllodes tumor, borderline </mat-radio-button>
+      <mat-radio-button value="malignant"> Phyllodes tumor, malignant  </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div>
+    <h4>Stromal Cellularity (Note B)</h4>
+    <mat-radio-group class="example-radio-group" aria-label="Select an option" formControlName="cellularity">
+      <mat-radio-button value="Mild (stromal nuclei are non-overlapping)"> Mild (stromal nuclei are non-overlapping) </mat-radio-button>
+      <mat-radio-button value="Moderate (some overlapping stromal nuclei)"> Moderate (some overlapping stromal nuclei) </mat-radio-button>
+      <mat-radio-button value="Marked (many overlapping stromal nuclei)"> Marked (many overlapping stromal nuclei)   </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div>
+    <h4>Stromal Atypia (Note C)</h4>
+    <mat-radio-group class="example-radio-group" aria-label="Select an option" formControlName="atypia">
+      <mat-radio-button value="Mild (minimal variation in nuclear size, even chromatin, and smooth nuclear contours)"> Mild (minimal variation in nuclear size, even chromatin, and smooth nuclear contours) </mat-radio-button>
+      <mat-radio-button value="Moderate (more variation in nuclear size and irregular nuclear membranes)"> Moderate (more variation in nuclear size and irregular nuclear membranes) </mat-radio-button>
+      <mat-radio-button value="Marked (marked nuclear pleomorphism, hyperchromasia, and irregular nuclear contours)"> Marked (marked nuclear pleomorphism, hyperchromasia, and irregular nuclear contours) </mat-radio-button>
+      <mat-radio-button value="none"> None </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div>
+    <h4>Stromal Overgrowth (Note D)</h4>
+    <mat-radio-group class="example-radio-group" aria-label="Select an option" formControlName="histologic">
+      <mat-radio-button value="Absent"> Absent </mat-radio-button>
+      <mat-radio-button value="Present"> Present </mat-radio-button>
+      <mat-radio-button value="Cannot be determined"> Cannot be determined </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div>
+    <h4>Mitotic Rate (Note E)</h4>
+   <mat-radio-group class="example-radio-group" (change)="onMitoticChange($event)" formControlName="tumorSize">
+     <mat-radio-button value="Mitotic">Enter Mitotic Rate </mat-radio-button>
+     <mat-radio-button value="Cannot be determined"> Cannot be determined </mat-radio-button>
+   </mat-radio-group>
  
+    <div *ngIf="showMitoticRate">
+     <mat-label class="spacing"> Specify number of mitoses per 10 high power fields : </mat-label>
+       <mat-form-field >
+         <input type="text" matInput formControlName="mitoticRate" >
+       </mat-form-field>
+     <mat-label class="spacing"> mitoses per 10 High Power Fields (HPFs).</mat-label> 
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div>
+    <h4>Histologic Tumor Border</h4>
+    <mat-radio-group class="example-radio-group" aria-label="Select an option" formControlName="tumorBorder">
+      <mat-radio-button value="Absent">  Circumscribed (well-defined; pushing)  </mat-radio-button>
+      <mat-radio-button value="Present">  Infiltrative (permeative)  </mat-radio-button>
+      <mat-radio-button value="Cannot be determined"> Cannot be determined </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div>
+    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperPrevious>Back</button>
+     &nbsp;
+    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperNext>Next</button>
+  </div>
+
+ </form>
+</mat-step>
+
+
+
 <mat-step>
  <ng-template matStepLabel>Done</ng-template>
    

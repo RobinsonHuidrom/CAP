@@ -1,4 +1,3 @@
-
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -39,6 +38,8 @@ export class HomeComponent implements OnInit {
   firstFormGroup!: FormGroup;
   secondFormGroup!: FormGroup;
   thirdFormGroup!: FormGroup;
+  fourthFormGroup!: FormGroup;
+  fifthFormGroup!: FormGroup;
 
   constructor(private _formBuilder: FormBuilder) {}
 
@@ -46,6 +47,8 @@ export class HomeComponent implements OnInit {
     this.initFirstFormGroup();
     this.initSecondFormGroup();
     this.initThirdFormGroup();
+    this.initFourthFormGroup();
+    this.initFifthFormGroup();
   }
 
   private initFirstFormGroup(): void {
@@ -103,13 +106,35 @@ export class HomeComponent implements OnInit {
       console.log('Selected Clock Names:', selectedClockValues);
     });
   }
-  
+
+  private initFourthFormGroup(): void {
+    this.fourthFormGroup = this._formBuilder.group({
+      dimension: [''],
+      dimension2: [''],
+      tumorSize: [''],
+      tumorSizeComment: ['']
+    });
+  }
+
+  private initFifthFormGroup(): void {
+    this.fifthFormGroup = this._formBuilder.group({
+      histologic:[''],
+      cellularity:[''],
+      atypia:[''],
+      overGrowth:[''],
+      mitoticRate:[''],
+      tumorBorder:['']
+    });
+  }
+
+ // Below codes are functions of respective stepper form
+
   isClockPositionSelected = false;
   updateClockPositionSelection(event: MatCheckboxChange) {
     this.isClockPositionSelected = event.checked;
   }
 
-  resetAllControls(event: MatCheckboxChange) {
+  resetTumorValues(event: MatCheckboxChange) {
     if (event.checked) {
       const tumorRadioControl = this.thirdFormGroup.get('tumorRadio');
   
@@ -125,7 +150,8 @@ export class HomeComponent implements OnInit {
       this.thirdFormGroup.enable({ emitEvent: false });
     }
   }
-  
+
+
   showOtherField: boolean = false;
   onRadioChange(event: MatRadioChange) {
     if (event.value === 'Other (specify)') {
@@ -135,10 +161,36 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  showComment: boolean = false;
+  showDimension: boolean = false;
+  onChange(event: MatRadioChange) {
+    this.showComment = false;
+    this.showDimension = false;
+  
+    if (event.value === 'Cannot be determined') {
+      this.showComment = true;
+    } else {
+      this.showDimension = true;
+    }
+  }
+
+  showMitoticRate: boolean = false;
+  onMitoticChange(event: MatRadioChange) {
+    if (event.value === 'Mitotic') {
+      this.showMitoticRate = true;
+    } else {
+      this.showMitoticRate = false;
+    }
+  }
+
+
+// Below code section is function to preview 
+
   getPreviewValues(): string {
     const firstStepValues = this.firstFormGroup.value;
     const secondStepValues = this.secondFormGroup.value;
     const thirdStepValues = this.thirdFormGroup.value;
+    const fourthStepValues = this.fourthFormGroup.value;
   
     const selectedTumorValues = this.getSelectedValues(
       thirdStepValues.tumorSites,
@@ -149,6 +201,7 @@ export class HomeComponent implements OnInit {
       thirdStepValues.clock,
       this.fetchClockList()
     );
+
 
     const tumorRadioValue = thirdStepValues.tumorRadio;
     const tumorSiteDisplayValue = tumorRadioValue ? 'Not Specified' : selectedTumorValues.join(', ');
@@ -171,18 +224,24 @@ export class HomeComponent implements OnInit {
       Clock Position: ${selectedClocks.join(', ')}
       Distance from Nipple: ${thirdStepValues.distance}
       Other: ${thirdStepValues.distance2}   
+
+      Tumor Size: 
+      Greatest dimension in Millimeters (mm):${fourthStepValues.dimension}
+      Additional Dimension in Millimeters (mm):${fourthStepValues.dimension2}
+      Cannot be determined (explain):${fourthStepValues.commentTumorSize }
     `;
   
     return preview;
-
   }
-
 
   private getSelectedValues(selectedItems: boolean[], itemList: any[]): string[] {
     return selectedItems
       .map((isSelected: boolean, index: number) => (isSelected ? itemList[index].value : null))
       .filter((value: string | null) => value !== null);
   }
+
+
+// Below codes are for data retrival functions or fixed data sets  
 
   fetchTumorList(): any[] {
     return [ 
