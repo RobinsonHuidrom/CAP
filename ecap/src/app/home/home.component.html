@@ -1,5 +1,4 @@
-
-<mat-vertical-stepper [linear]="false" #stepper animationDuration="1000">
+<mat-stepper linear #stepper animationDuration="400"> 
 
   <mat-step [stepControl]="firstFormGroup">
     <form [formGroup]="firstFormGroup">
@@ -83,7 +82,7 @@
 
    <div formArrayName="tumorSites" class="checkboxes">
     <mat-checkbox *ngFor="let tumor of fetchTumorList(); let i = index;" [formControlName]="i" >{{ tumor.value }}</mat-checkbox>
-  </div>
+   </div>
   
   <section class="example-section">
     <mat-checkbox  value="Clock position" formControlName="clockRadio" (change)="updateClockPositionSelection($event)">Clock position</mat-checkbox>
@@ -169,7 +168,7 @@
 
 <mat-step [stepControl]="fifthFormGroup">
   <form [formGroup]="fifthFormGroup">
-    <ng-template matStepLabel> Malignant phyllodes tumor diagnosis requirement </ng-template>
+    <ng-template matStepLabel> Malignant phyllodes tumor  </ng-template>
 
   <div>
     <h4>Histologic Type (Note A)</h4>
@@ -218,7 +217,7 @@
 
   <div>
     <h4>Mitotic Rate (Note E)</h4>
-   <mat-radio-group class="example-radio-group" (change)="onMitoticChange($event)" formControlName="tumorSize">
+   <mat-radio-group class="example-radio-group" (change)="onMitoticChange($event)" formControlName="mitotic">
      <mat-radio-button value="Mitotic">Enter Mitotic Rate </mat-radio-button>
      <mat-radio-button value="Cannot be determined"> Cannot be determined </mat-radio-button>
    </mat-radio-group>
@@ -237,10 +236,35 @@
   <div>
     <h4>Histologic Tumor Border</h4>
     <mat-radio-group class="example-radio-group" aria-label="Select an option" formControlName="tumorBorder">
-      <mat-radio-button value="Absent">  Circumscribed (well-defined; pushing)  </mat-radio-button>
-      <mat-radio-button value="Present">  Infiltrative (permeative)  </mat-radio-button>
-      <mat-radio-button value="Cannot be determined"> Cannot be determined </mat-radio-button>
+      <mat-radio-button value="circumscribed">Circumscribed (well-defined; pushing)</mat-radio-button>
+      <mat-radio-button value="infiltrative">Infiltrative (permeative)</mat-radio-button>
+        <div *ngIf="fifthFormGroup?.get('tumorBorder')?.value === 'infiltrative'">
+          <mat-radio-group style="margin-left: 40px;">
+           <mat-radio-button value="focal">Focal</mat-radio-button>
+           <mat-radio-button value="extensive">Extensive</mat-radio-button>
+          </mat-radio-group>
+        </div>  
+      <mat-radio-button value="cannot_determine">Cannot be determined</mat-radio-button>
     </mat-radio-group>
+  </div>
+
+
+  <div>
+    <h4>Malignant Heterologous Elements (Note F)</h4>
+    <mat-radio-group class="example-radio-group" aria-label="Select an option" formControlName="malignant">
+      <mat-radio-button value="Liposarcoma (excluding well-differentiated liposarcoma)">Liposarcoma (excluding well-differentiated liposarcoma)</mat-radio-button>
+      <mat-radio-button value="Osteosarcoma">Osteosarcoma </mat-radio-button>
+      <mat-radio-button value="Chondrosarcoma">Chondrosarcoma </mat-radio-button>
+      <mat-radio-button value="Chondrosarcoma"> Not identified </mat-radio-button>
+      <mat-radio-button value="other"> Other (specify): </mat-radio-button>
+    </mat-radio-group>
+
+    <div *ngIf="fifthFormGroup?.get('malignant')?.value === 'other'">
+      <mat-form-field class="example-full-width">
+        <mat-label>Describe here</mat-label>
+        <textarea matInput style="height: 130px;" formControlName="commentMalignant"></textarea>
+      </mat-form-field>
+    </div>  
   </div>
 
   <mat-divider></mat-divider>
@@ -269,6 +293,7 @@
       <button  class="buttonColor" mat-raised-button color="primary">Reset</button>
       <button  class="buttonColor" mat-raised-button color="accent">Submit</button>
     </div>
-</mat-step>
+ </mat-step>
+ 
+</mat-stepper>
 
-</mat-vertical-stepper>

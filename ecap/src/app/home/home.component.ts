@@ -122,8 +122,11 @@ export class HomeComponent implements OnInit {
       cellularity:[''],
       atypia:[''],
       overGrowth:[''],
+      mitotic:[''],
       mitoticRate:[''],
-      tumorBorder:['']
+      tumorBorder:[''],
+      malignant:[''],
+      commentMalignant:['']
     });
   }
 
