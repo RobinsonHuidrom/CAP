@@ -2,7 +2,7 @@
 
   <mat-step [stepControl]="firstFormGroup">
     <form [formGroup]="firstFormGroup">
-      <ng-template matStepLabel>Patient Details</ng-template>       
+      <ng-template matStepLabel>Patient Info</ng-template>       
       <mat-form-field >
         <mat-label>Enter Full Name</mat-label>
         <input type="text" matInput formControlName="name">
@@ -116,6 +116,34 @@
    </div>
 
    <mat-divider></mat-divider>
+
+   <h4>Tumor Size :</h4>
+   
+   <mat-radio-group class="example-radio-group" (change)="onChange($event)" formControlName="tumorSize">
+    <mat-radio-button value="dimension">Enter dimension: </mat-radio-button>
+    <mat-radio-button value="Cannot be determined"> Cannot be determined (explain): </mat-radio-button>
+  </mat-radio-group>
+
+  <div *ngIf="showComment">
+    <mat-form-field class="example-full-width">
+      <mat-label>Enter here</mat-label>
+      <textarea matInput style="height: 130px;" formControlName="tumorSizeComment"></textarea>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="showDimension">
+    <mat-label class="spacing"> Greatest dimension in Millimeters (mm) : </mat-label>  
+      <mat-form-field >
+        <input type="number" matInput formControlName="dimension" >
+      </mat-form-field>
+    <br>
+    <mat-label class="spacing">Additional Dimension in Millimeters (format ____ x ____ mm) : </mat-label>  
+     <mat-form-field >
+        <input type="text" placeholder="Example: 34x45" matInput formControlName="dimension2" >
+     </mat-form-field>
+  </div>
+
+  <mat-divider></mat-divider>
  
     <div>
       <button mat-button style="background-color: rgb(16, 196, 228);" matStepperPrevious>Back</button>
@@ -126,48 +154,8 @@
  </form>
 </mat-step>
 
-
 <mat-step [stepControl]="fourthFormGroup">
   <form [formGroup]="fourthFormGroup">
-    <ng-template matStepLabel> Tumor Size </ng-template>
-
-    <mat-radio-group class="example-radio-group" (change)="onChange($event)" formControlName="tumorSize">
-      <mat-radio-button value="dimension">Enter dimension: </mat-radio-button>
-      <mat-radio-button value="Cannot be determined"> Cannot be determined (explain): </mat-radio-button>
-    </mat-radio-group>
-
-    <div *ngIf="showComment">
-      <mat-form-field class="example-full-width">
-        <mat-label>Enter here</mat-label>
-        <textarea matInput style="height: 130px;" formControlName="tumorSizeComment"></textarea>
-      </mat-form-field>
-    </div>
-
-    <div *ngIf="showDimension">
-      <mat-label class="spacing"> Greatest dimension in Millimeters (mm) : </mat-label>  
-        <mat-form-field >
-          <input type="number" matInput formControlName="dimension" >
-        </mat-form-field>
-      <br>
-      <mat-label class="spacing">Additional Dimension in Millimeters (format ____ x ____ mm) : </mat-label>  
-       <mat-form-field >
-          <input type="text" placeholder="Example: 34x45" matInput formControlName="dimension2" >
-       </mat-form-field>
-    </div>
-
-    <mat-divider></mat-divider>
-    
-  <div>
-    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperPrevious>Back</button>
-     &nbsp;
-    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperNext>Next</button>
-  </div>
-
- </form>
-</mat-step>
-
-<mat-step [stepControl]="fifthFormGroup">
-  <form [formGroup]="fifthFormGroup">
     <ng-template matStepLabel> Malignant phyllodes tumor  </ng-template>
 
   <div>
@@ -278,7 +266,42 @@
  </form>
 </mat-step>
 
+<mat-step [stepControl]="fifthFormGroup">
+  <form [formGroup]="fifthFormGroup">
+    <ng-template matStepLabel> MARGINS </ng-template>
 
+    <h4>Margin Status for Phyllodes Tumor :</h4>
+    <mat-radio-group class="example-radio-group" aria-label="Select an option" (change)="onRadioChange($event)" formControlName="margins">
+      <mat-radio-button value="All margins negative for phyllodes tumor"> All margins negative for phyllodes tumor </mat-radio-button>
+      <mat-radio-button value="Phyllodes tumor present at margin"> Phyllodes tumor present at margin </mat-radio-button>
+      <mat-radio-button value="Not specified"> Other (specify): </mat-radio-button>
+      <mat-radio-button value="Other (specify)"> Cannot be determined (explain): </mat-radio-button>
+    </mat-radio-group>
+
+  <div>
+    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperPrevious>Back</button>
+     &nbsp;
+    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperNext>Next</button>
+  </div>
+
+ </form>
+</mat-step>
+
+<mat-step [stepControl]="sixthFormGroup">
+  <form [formGroup]="sixthFormGroup">
+    <ng-template matStepLabel> REGIONAL LYMPH NODES  </ng-template>
+
+
+    <mat-divider></mat-divider>
+    
+  <div>
+    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperPrevious>Back</button>
+     &nbsp;
+    <button mat-button style="background-color: rgb(16, 196, 228);" matStepperNext>Next</button>
+  </div>
+
+ </form>
+</mat-step>
 
 <mat-step>
  <ng-template matStepLabel>Done</ng-template>
@@ -296,4 +319,3 @@
  </mat-step>
  
 </mat-stepper>
-

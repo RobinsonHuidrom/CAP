@@ -40,6 +40,7 @@ export class HomeComponent implements OnInit {
   thirdFormGroup!: FormGroup;
   fourthFormGroup!: FormGroup;
   fifthFormGroup!: FormGroup;
+  sixthFormGroup!: FormGroup;
 
   constructor(private _formBuilder: FormBuilder) {}
 
@@ -49,6 +50,7 @@ export class HomeComponent implements OnInit {
     this.initThirdFormGroup();
     this.initFourthFormGroup();
     this.initFifthFormGroup();
+    this.initSixthFormGroup();
   }
 
   private initFirstFormGroup(): void {
@@ -88,7 +90,11 @@ export class HomeComponent implements OnInit {
       distance: [''],
       distance2: [''],
       clockRadio: [''],
-      tumorRadio: ['']
+      tumorRadio: [''],
+      dimension: [''],
+      dimension2: [''],
+      tumorSize: [''],
+      tumorSizeComment: ['']
     });
   
     // Subscribe to changes in both tumorSites and clock FormArrays
@@ -109,15 +115,6 @@ export class HomeComponent implements OnInit {
 
   private initFourthFormGroup(): void {
     this.fourthFormGroup = this._formBuilder.group({
-      dimension: [''],
-      dimension2: [''],
-      tumorSize: [''],
-      tumorSizeComment: ['']
-    });
-  }
-
-  private initFifthFormGroup(): void {
-    this.fifthFormGroup = this._formBuilder.group({
       histologic:[''],
       cellularity:[''],
       atypia:[''],
@@ -127,6 +124,18 @@ export class HomeComponent implements OnInit {
       tumorBorder:[''],
       malignant:[''],
       commentMalignant:['']
+    });
+  }
+
+  private initFifthFormGroup(): void {
+    this.fifthFormGroup = this._formBuilder.group({
+      margins:['']
+    });
+  }
+
+  private initSixthFormGroup(): void {
+    this.sixthFormGroup = this._formBuilder.group({
+    
     });
   }
 
@@ -153,7 +162,6 @@ export class HomeComponent implements OnInit {
       this.thirdFormGroup.enable({ emitEvent: false });
     }
   }
-
 
   showOtherField: boolean = false;
   onRadioChange(event: MatRadioChange) {
@@ -186,7 +194,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-
 // Below code section is function to preview 
 
   getPreviewValues(): string {
@@ -204,7 +211,6 @@ export class HomeComponent implements OnInit {
       thirdStepValues.clock,
       this.fetchClockList()
     );
-
 
     const tumorRadioValue = thirdStepValues.tumorRadio;
     const tumorSiteDisplayValue = tumorRadioValue ? 'Not Specified' : selectedTumorValues.join(', ');
@@ -243,7 +249,6 @@ export class HomeComponent implements OnInit {
       .filter((value: string | null) => value !== null);
   }
 
-
 // Below codes are for data retrival functions or fixed data sets  
 
   fetchTumorList(): any[] {
@@ -274,4 +279,3 @@ export class HomeComponent implements OnInit {
     ];
   }
 }
-
