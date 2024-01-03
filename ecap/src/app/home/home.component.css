@@ -21,7 +21,35 @@
   width: 100%;
 }
 
-
 mat-divider {
   margin : 15px 0 15px 0;
+}
+
+
+
+.third-section {
+  margin: 12px 0;
+}
+
+.third-margin {
+  margin: 0 12px;
+}
+
+.aqua-button {
+  background-color: rgb(115, 231, 231);
+  margin-right: 10px;
+}
+
+ul {
+  list-style-type: none;
+  margin-top: 4px;
+}
+
+ul.clock-subtasks li {
+  margin-right: 22px; /* Adjust spacing as desired */
+  display: inline;
+}
+
+.third-section .third-list-section ul li mat-form-field  {
+  width: 70%;
 }
