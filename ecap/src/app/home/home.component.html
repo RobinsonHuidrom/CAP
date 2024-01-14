@@ -170,7 +170,7 @@
     </div>
   
     <mat-divider></mat-divider>
-  
+
     <div>
       <h4>Mitotic Rate (Note E)</h4>
      <mat-radio-group class="example-radio-group" (change)="onMitoticChange($event)" formControlName="mitotic">
@@ -195,7 +195,7 @@
         <mat-radio-button value="circumscribed">Circumscribed (well-defined; pushing)</mat-radio-button>
         <mat-radio-button value="infiltrative">Infiltrative (permeative)</mat-radio-button>
           <div *ngIf="fourthFormGroup?.get('tumorBorder')?.value === 'infiltrative'">
-            <mat-radio-group style="margin-left: 40px;">
+            <mat-radio-group style="margin-left: 40px;" formControlName="infiltrativeExtent">
              <mat-radio-button value="focal">Focal</mat-radio-button>
              <mat-radio-button value="extensive">Extensive</mat-radio-button>
             </mat-radio-group>
@@ -250,6 +250,5 @@
   </mat-step>
     
 </mat-stepper>
-
 
 

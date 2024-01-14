@@ -102,6 +102,7 @@ export class HomeComponent implements OnInit {
       mitotic:[''],
       mitoticRate:[''],
       tumorBorder:[''],
+      infiltrativeExtent: [''], // Add the nested control
       malignant:[''],
       commentMalignant:['']
     });
@@ -196,6 +197,8 @@ export class HomeComponent implements OnInit {
     this.notSpecifiedSelected = !this.notSpecifiedSelected;
     this.allComplete = false; // Reset the "allComplete" flag to enable the checkbox
   }
+
+
   
 // FourthFormGroup functions 
   showMitoticRate: boolean = false;
@@ -205,6 +208,12 @@ export class HomeComponent implements OnInit {
     } else {
       this.showMitoticRate = false;
     }
+
+    if (!this.showMitoticRate) {
+      this.fourthFormGroup.get('mitoticRate')?.setValue(null);
+    }
+
+    this.cdRef.detectChanges(); // Trigger change detection
   }
 
 getPreviewValues(): string {
@@ -264,9 +273,10 @@ const preview =
 `   Stromal Cellularity: ${fourthStepValues.cellularity}\n` +
 `   Stromal Atypia: ${fourthStepValues.atypia}\n` +
 `   Stromal Overgrowth: ${fourthStepValues.overGrowth}\n` +
-`   Mitotic Rate: ${fourthStepValues.mitoticRate}\n` +
-`   Histologic Tumor Border: ${fourthStepValues.tumorBorder}\n` + 
-`   Malignant Heterologous Elements: ${fourthStepValues.malignant}\n`;
+`   Mitotic Rate: ${fourthStepValues.mitotic === 'Mitotic' ? fourthStepValues.mitoticRate : fourthStepValues.mitotic}\n` +
+`   Histologic Tumor Border: ${fourthStepValues.tumorBorder === 'infiltrative' ? 'Infiltrative (permeative) - ' + fourthStepValues.infiltrativeExtent : fourthStepValues.tumorBorder}\n` + 
+`   Malignant Heterologous Elements: ${fourthStepValues.malignant === 'other' ? 'Other (specify) - '+ fourthStepValues.commentMalignant : fourthStepValues.malignant}\n`;
+
 
   return preview;
 }
