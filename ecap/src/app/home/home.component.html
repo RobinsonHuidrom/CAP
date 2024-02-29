@@ -4,45 +4,6 @@
 
   <mat-step [stepControl]="firstFormGroup">
     <form [formGroup]="firstFormGroup">
-      <ng-template matStepLabel>Patient Info</ng-template>       
-      <mat-form-field >
-        <mat-label>Enter Full Name</mat-label>
-        <input type="text" matInput formControlName="name">
-      </mat-form-field>
-      &nbsp;
-      <mat-form-field >
-        <mat-label>Age</mat-label>
-        <input type="number" matInput formControlName="age">
-      </mat-form-field>
-      &nbsp;
-      <mat-form-field hintLabel="Max 10 characters">
-        <mat-label>LAB Number</mat-label>
-        <input matInput #input maxlength="10" formControlName="labNo">
-        <mat-hint align="end">{{input.value.length}}/10</mat-hint>
-      </mat-form-field>
-      &nbsp;
-      <mat-form-field hintLabel="Select Male or Female ">
-        <mat-label>Gender </mat-label>
-        <mat-select formControlName="gender">
-          <mat-option value="Male">Male</mat-option>
-          <mat-option value="Female">Female</mat-option>
-        </mat-select>
-        <mat-hint align="end"> </mat-hint>
-      </mat-form-field>
-      &nbsp;
-      <mat-form-field hintLabel="Max 50 characters">
-        <mat-label>Address</mat-label >
-        <input matInput #input maxlength="50" placeholder="Street,Town,City" formControlName="address">
-        <mat-hint align="end">{{input.value.length}}/50</mat-hint>
-      </mat-form-field>
-      <div >
-        <button mat-button  class="buttonColor aqua-button" matStepperNext>Next</button>
-      </div>
-    </form>
-  </mat-step>
-
-  <mat-step [stepControl]="secondFormGroup">
-    <form [formGroup]="secondFormGroup">
       <ng-template matStepLabel>Specimen</ng-template>
 
       <h4>Procedure :</h4>
@@ -67,6 +28,67 @@
         <mat-radio-button value="Not specified"> Not specified </mat-radio-button>
       </mat-radio-group>
 
+      <div >
+        <button mat-button  class="buttonColor aqua-button" matStepperNext>Next</button>
+      </div>
+    </form>
+  </mat-step>
+
+
+  <mat-step [stepControl]="secondFormGroup">
+    <form [formGroup]="secondFormGroup">
+      <ng-template matStepLabel>Tumor Site</ng-template>
+      <ul>
+        <!-- Tumor Site -->
+        <li>
+          <mat-checkbox formControlName="marginsPresent" value="margins-present">
+            <span class="mat-body-1">Tumor Site (select all that apply)</span>
+          </mat-checkbox>
+          <ul>
+            <!-- Level 2 checkboxes -->
+            <li><mat-checkbox formControlName="upperOuterQuadrant" value="upper-outer-quadrant">Upper Outer Quadrant</mat-checkbox></li>
+            <li><mat-checkbox formControlName="lowerOuterQuadrant" value="lower-outer-quadrant">Lower Outer Quadrant</mat-checkbox></li>
+            <li><mat-checkbox formControlName="upperInnerQuadrant" value="upper-inner-quadrant">Upper Inner Quadrant</mat-checkbox></li>
+            <li><mat-checkbox formControlName="lowerInnerQuadrant" value="lower-inner-quadrant">Lower Inner Quadrant</mat-checkbox></li>
+            <li><mat-checkbox formControlName="central" value="central-present">Central</mat-checkbox></li>
+            <li><mat-checkbox formControlName="nipple" value="nipple-present">Nipple</mat-checkbox></li>
+            
+            <!-- Clock position -->
+            <li>
+              <mat-checkbox formControlName="clockPositionPresent" value="clock-position-present">Clock position</mat-checkbox>
+              <ul *ngIf="secondFormGroup.get('clockPositionPresent')?.value">
+                <!-- Level 3 checkboxes -->
+                <li><mat-checkbox formControlName="oneClock" value="one-o-clock">1 o'clock</mat-checkbox></li>
+                <li><mat-checkbox formControlName="twoClock" value="two-o-clock">2 o'clock</mat-checkbox></li>
+                <li><mat-checkbox formControlName="threeClock" value="three-o-clock">3 o'clock</mat-checkbox></li>
+                <!-- Add more clock positions as needed -->
+              </ul>
+            </li>
+
+            <!-- Specify distance from nipple -->
+            <li>
+              <mat-checkbox formControlName="distFromNipple" value="dist-From-Nipple">Specify distance from nipple in Centimeters (cm):</mat-checkbox>
+              <mat-form-field *ngIf="secondFormGroup.get('distFromNipple')?.value" appearance="fill">
+                <input matInput formControlName="distFromNippleText" placeholder="Specify here">
+              </mat-form-field>
+            </li>
+
+            <!-- Other (specify) -->
+            <li>
+              <mat-checkbox formControlName="otherPresentSpecify" value="other-Present-Specify">Other (specify):</mat-checkbox>
+              <mat-form-field *ngIf="secondFormGroup.get('otherPresentSpecify')?.value" appearance="fill">
+                <input matInput formControlName="otherPresentSpecifyText" placeholder="Specify here">
+              </mat-form-field>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Not specified -->
+        <li>
+          <mat-checkbox formControlName="notSpecified" value="not-Specified" (click)="toggleAllCheckboxes()">Not specified</mat-checkbox>
+        </li>
+      </ul>
+
       <div>
         <button mat-button class="buttonColor aqua-button" matStepperPrevious>Back</button>
         <button mat-button class="buttonColor aqua-button" matStepperNext>Next</button>
@@ -74,46 +96,37 @@
    </form>
   </mat-step>
 
+
   <mat-step [stepControl]="thirdFormGroup">
     <form [formGroup]="thirdFormGroup">
-      <ng-template matStepLabel>Tumor site</ng-template>
-  
-      <section class="third-section">
-        <span class="third-list-section">
-          <mat-checkbox  class="third-margin"  [checked]="allComplete"  [indeterminate]="someComplete()"
-          [disabled]="notSpecifiedSelected || disableCheckboxes"  (change)="setAll($event.checked)">
-          {{ task.name }}
-        </mat-checkbox>
-        </span>
-        <span class="third-list-section">
-          <ul>
-            <li *ngFor="let subtask of task.subtasks">
-              <mat-checkbox [disabled]="notSpecifiedSelected || disableCheckboxes" [checked]="subtask.completed" (change)="updateAllComplete(subtask)">
-                {{ subtask.name }}
-              </mat-checkbox>
+      <ng-template matStepLabel>Tumor Size</ng-template>
+       <!-- Tumor Size -->
+    <div>
+      <span class="mat-body-1">Tumor Size</span>
 
-              <ul *ngIf="subtask?.subtasks" class="clock-subtasks">
-                <li *ngFor="let clockSubtask of subtask.subtasks">
-                  <mat-checkbox [disabled]="!allComplete && isClockSubtaskDisabled" [checked]="clockSubtask.completed" (change)="updateAllComplete(clockSubtask)">
-                    {{ clockSubtask.name }}
-                  </mat-checkbox>
-                </li>
-              </ul>
+      <mat-divider></mat-divider>
+
+      <mat-radio-group class="example-radio-group" formControlName="tumorSizeOption">
+        <mat-radio-button value="dimension">
+          Greatest dimension in Millimeters (mm):
+          <input matInput type="number" formControlName="greatestDimension"> mm
+        </mat-radio-button>
+
+          <!-- Additional Dimension Checkbox -->
+          <mat-checkbox style="margin-left: 40px;"  *ngIf="thirdFormGroup.get('tumorSizeOption')?.value === 'dimension'" formControlName="additionalDimensionChecked">
+              Additional Dimension in Millimeters (mm):
+              <input matInput type="number" formControlName="additionalDimensionX"> x
+              <input matInput type="number" formControlName="additionalDimensionY"> mm
+          </mat-checkbox>
         
-              <ng-container *ngIf="subtask.name === 'Specify distance from nipple in Centimeters' || subtask.name === 'Other (specify)'">
-                <mat-form-field *ngIf="subtask.completed" >
-                  <textarea *ngIf="subtask.name === 'Other (specify)'" matInput formControlName="otherSpecify" rows="4"></textarea>
-                  <input *ngIf="subtask.name === 'Specify distance from nipple in Centimeters'" type="number" matInput formControlName="distanceFromNipple">
-                  <mat-label>{{ subtask.name }}</mat-label>
-                </mat-form-field>
-              </ng-container>        
-             
-            </li>
-            <mat-checkbox  [disabled]="disableCheckboxes" (change)="resetAndToggleDisable()" >Not Specified</mat-checkbox>
-          </ul>
-        </span>
-        
-      </section>
+        <mat-radio-button value="cannotDetermine">
+          Cannot be determined (explain):
+          <input matInput type="text" formControlName="cannotDetermineExplanation">
+        </mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    <mat-divider></mat-divider>
   
       <div>
         <button mat-button class="buttonColor aqua-button" matStepperPrevious>Back</button>
@@ -121,6 +134,7 @@
       </div>
     </form>
   </mat-step>
+
 
   <mat-step [stepControl]="fourthFormGroup">
     <form [formGroup]="fourthFormGroup">
@@ -234,14 +248,97 @@
    </form>
   </mat-step>
 
+  
+  <mat-step [stepControl]="fifthFormGroup">
+    <form [formGroup]="fifthFormGroup">
+      <div class="tree-structure">
+        <h2>Margins for Phyllodes Tumor</h2>
+        <!-- All margins negative -->
+        <ul>
+          <li>
+            <mat-checkbox formControlName="allMarginsNegative" value="all-margins-negative" (change)="resetChildControls('allMarginsNegative')"><span class="mat-body-1">All margins negative for phyllodes tumor</span></mat-checkbox>
+          </li>
+          <!-- Closest Margin(s) to Phyllodes Tumor -->
+          <h3>Closest Margin(s) to Phyllodes Tumor (select all that apply)</h3>
+          <ul>
+            <!-- Inner checkboxes -->
+            <!-- Add (change) event handler to reset inputs when parent checkbox is unselected -->
+            <li *ngFor="let direction of directions">
+              <mat-checkbox [formControlName]="direction.controlName" [value]="direction.value" (change)="resetChildControls('allMarginsNegative')">{{ direction.label }}</mat-checkbox>
+              <!-- Render input field for 'Other (specify):' option -->
+              <mat-form-field *ngIf="direction.label === 'Other (specify):'" appearance="fill">
+                <input matInput formControlName="otherMarginClosestText" placeholder="Specify here">
+              </mat-form-field>
+              <!-- Render input field for 'Cannot be determined (explain)' option -->
+              <mat-form-field *ngIf="direction.label === 'Cannot be determined (explain):'" appearance="fill">
+                <input matInput formControlName="cannotDetermineMarginClosestText" placeholder="Explain">
+              </mat-form-field>
+            </li>
+          </ul>
+
+          <!-- Distance from Phyllodes Tumor to Closest Margin -->
+          <h3>Distance from Phyllodes Tumor to Closest Margin (select one)</h3>
+          <ul>
+            <li *ngFor="let distanceOption of distanceOptions">
+              <mat-radio-button [value]="distanceOption.value" [disabled]="!fifthFormGroup.get('allMarginsNegative')?.value">{{ distanceOption.label }}<mat-form-field><input matInput type="text" formControlName="{{ distanceOption.controlName }}"></mat-form-field></mat-radio-button>
+            </li>
+          </ul>
+
+          <!-- Phyllodes tumor present at margin -->
+          <li>
+            <mat-checkbox formControlName="phyllodesPresent" value="phyllodes-present" (change)="resetChildControls('phyllodesPresent')"><span class="mat-body-1">Phyllodes tumor present at margin</span></mat-checkbox>
+          </li>
+
+          <!-- Margin(s) Involved by Phyllodes Tumor -->
+          <h3>Margin(s) Involved by Phyllodes Tumor (select all that apply)</h3>
+          <ul>
+            <!-- Inner checkboxes -->
+            <!-- Add (change) event handler to reset inputs when parent checkbox is unselected -->
+            <li *ngFor="let option of phyllodesMarginOptions">
+              <mat-checkbox [formControlName]="option.controlName" [value]="option.value" (change)="resetChildControls('phyllodesPresent')">{{ option.label }}</mat-checkbox>
+              <!-- Render input field for 'Other (specify):' option -->
+              <mat-form-field *ngIf="option.label === 'Other (specify):'" appearance="fill">
+                <input matInput formControlName="otherMarginPresentText" placeholder="Specify here">
+              </mat-form-field>
+              <!-- Render input field for 'Cannot be determined (explain)' option -->
+              <mat-form-field *ngIf="option.label === 'Cannot be determined (explain):'" appearance="fill">
+                <input matInput formControlName="cannotDetermineMarginPresentText" placeholder="Explain">
+              </mat-form-field>
+            </li>
+          </ul>
+
+          <!-- Other (specify) -->
+          <li>
+            <mat-checkbox formControlName="other" value="other" (change)="resetChildControls('other')">
+              <span class="mat-body-1">Other (specify):</span>
+              <mat-form-field appearance="fill">
+                <input matInput formControlName="otherText" placeholder="Other specify">
+              </mat-form-field>
+            </mat-checkbox>
+          </li>
+
+          <!-- Cannot be determined (explain) -->
+          <li>
+            <mat-checkbox formControlName="cannotDetermine" value="cannot-determine" (change)="resetChildControls('cannotDetermine')">
+              <span class="mat-body-1">Cannot be determined (explain): </span>
+              <mat-form-field appearance="fill">
+                <input matInput formControlName="cannotDetermineText" placeholder="Explain here">
+              </mat-form-field>
+            </mat-checkbox>
+          </li>
+        </ul>
+
+        <div>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </div>
+    </form>
+  </mat-step>
+
 
   <mat-step>
     <ng-template matStepLabel>Done</ng-template>
       
-    <div>
-      <h3>Preview:</h3>
-      <pre style="padding: 10px;">{{ getPreviewValues() }}</pre>
-    </div>
    
     <div>
       <button mat-button class="buttonColor aqua-button" matStepperPrevious>Back</button>

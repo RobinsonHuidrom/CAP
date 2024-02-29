@@ -12,13 +12,8 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatListModule} from '@angular/material/list';
 import {MatIconModule} from '@angular/material/icon';
 import {CommonModule} from '@angular/common';
+import { Subscription } from 'rxjs';
 
-interface Task {
-  name: string;
-  completed: boolean;
-  subtasks?: Task[]; // Note the change here to use Task[] for subtasks
-  dataInput: string | number | 'Not Specified';
-}
 
 @Component({
   selector: 'app-home',
@@ -50,9 +45,44 @@ export class HomeComponent implements OnInit {
   secondFormGroup!: FormGroup;
   thirdFormGroup!: FormGroup;
   fourthFormGroup!: FormGroup; 
+  fifthFormGroup!: FormGroup;
   isClockSubtaskDisabled = true;
   disableCheckboxes = false;
   notSpecifiedSelected = false;
+
+  private formSubscription!: Subscription;
+
+  
+  // Define arrays for directions and distance options
+  directions: { controlName: string, value: string, label: string }[] = [
+    { controlName: 'anterior', value: 'anterior', label: 'Anterior' },
+    { controlName: 'posterior', value: 'posterior', label: 'Posterior' },
+    { controlName: 'superiorClosest', value: 'superior-closest', label: 'Superior' },
+    { controlName: 'inferiorClosest', value: 'inferior-closest', label: 'Inferior' },
+    { controlName: 'medialClosest', value: 'medial-closest', label: 'Medial' },
+    { controlName: 'lateralClosest', value: 'lateral-closest', label: 'Lateral' },
+    { controlName: 'otherMarginClosestText', value: 'other-Margin-Closest-Text', label: 'Other (specify):'  },
+    { controlName: 'cannotDetermineMarginClosestText', value: 'cannot-Determine-Margin-Closest-Text', label: 'Cannot be determined (explain):' }
+  ];
+
+  distanceOptions: { controlName: string, value: string, label: string }[] = [
+    { controlName: 'exactDistance', value: 'exact-distance', label: 'Exact distance:' },
+    { controlName: 'lessThan', value: 'less-than', label: 'Less than:' },
+    { controlName: 'greaterThan', value: 'greater-than', label: 'Greater than:' },
+    { controlName: 'otherDistanceText', value: 'other-distance-text', label: 'Other (specify):' },
+    { controlName: 'cannotDetermineDistanceText', value: 'cannot-determine-distance-text', label: 'Cannot be determined (explain):' }
+  ];
+
+  phyllodesMarginOptions: { controlName: string, value: string, label: string }[] = [
+    { controlName: 'involvedAnteriorPresent', value: 'involved-anterior-present', label: 'Anterior' },
+    { controlName: 'involvedPosteriorPresent', value: 'involved-posterior-present', label: 'Posterior' },
+    { controlName: 'superiorPresent', value: 'superior-present', label: 'Superior' },
+    { controlName: 'inferiorPresent', value: 'inferior-present', label: 'Inferior' },
+    { controlName: 'medialPresent', value: 'medial-present', label: 'Medial' },
+    { controlName: 'lateralPresent', value: 'lateral-present', label: 'Lateral' },
+    { controlName: 'otherMarginPresentText', value: 'other-Margin-Present-Text', label: 'Other (specify):'  },
+    { controlName: 'cannotDetermineMarginPresentText', value: 'cannot-Determine-Margin-Present-Text', label: 'Cannot be determined (explain):' }
+  ];
 
   constructor(private _formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {}
 
@@ -61,35 +91,57 @@ export class HomeComponent implements OnInit {
     this.initSecondFormGroup();
     this.initThirdFormGroup();
     this.initFourthFormGroup();
-    this.initSubtaskState();
+    this.initFifthFormGroup();
+    this.subscribeToAllMarginsNegativeChanges();
+    this.subscribeToPhyllodesPresentChanges(); 
+    this.subscribeToFormChanges();
+  }
+
+  ngOnDestroy(): void {
+    if (this.formSubscription) {
+      this.formSubscription.unsubscribe();
+    }
   }
 
   private initFirstFormGroup(): void {
     this.firstFormGroup = this._formBuilder.group({
-      name: [''],
-      age: [''],
-      gender: [''],
-      labNo: [''],
-      address: [''],
-    });
-  }  
-
-  private initSecondFormGroup(): void {
-    this.secondFormGroup = this._formBuilder.group({
       procedure: [''],
       comment: [''],
       direction: ['']
     });
   }
 
-  private initThirdFormGroup(): void {
-    const group: any = {};
-
-    (this.task.subtasks || []).forEach(subtask => {
-      group[subtask.name] = this._formBuilder.control(subtask.dataInput);
+  private initSecondFormGroup(): void {
+    this.secondFormGroup = this._formBuilder.group({
+      marginsPresent: false,
+      upperOuterQuadrant: { value: false, disabled: true },
+      lowerOuterQuadrant: { value: false, disabled: true },
+      upperInnerQuadrant: { value: false, disabled: true },
+      lowerInnerQuadrant: { value: false, disabled: true },
+      central: { value: false, disabled: true },
+      nipple: { value: false, disabled: true },
+      clockPositionPresent: { value: false, disabled: true },
+      oneClock: { value: false, disabled: true },
+      twoClock: { value: false, disabled: true },
+      threeClock: { value: false, disabled: true },
+      distFromNipple: { value: false, disabled: true },
+      distFromNippleText: '',
+      otherPresentSpecify: { value: false, disabled: true },
+      otherPresentSpecifyText: '',
+      notSpecified: false
+      
     });
+  }
 
-    this.thirdFormGroup = this._formBuilder.group(group);
+  private initThirdFormGroup(): void {
+    this.thirdFormGroup = this._formBuilder.group({
+      tumorSizeOption: [''],
+      greatestDimension: [''],
+      cannotDetermineExplanation: [''],
+      additionalDimensionChecked: [false],
+      additionalDimensionX: [''],
+      additionalDimensionY: ['']
+    });
   }
   
 
@@ -109,7 +161,102 @@ export class HomeComponent implements OnInit {
   }
 
 
-  // For secondFormGroup Other specify comment
+  private initFifthFormGroup(): void {
+    this.fifthFormGroup = this._formBuilder.group({
+      allMarginsNegative: false,
+      anterior: false,
+      posterior: false,
+      superiorClosest: false,
+      inferiorClosest: false,
+      medialClosest: false,
+      lateralClosest: false,
+      otherMarginClosestText: '',
+      cannotDetermineMarginClosestText: '',
+      exactDistance: '',
+      lessThan: '',
+      greaterThan: '',
+      otherDistanceText: '',
+      cannotDetermineDistanceText: '',
+      phyllodesPresent: false,
+      involvedAnteriorPresent: false,
+      involvedPosteriorPresent: false,
+      superiorPresent: false,
+      inferiorPresent: false,
+      medialPresent: false,
+      lateralPresent: false,
+      otherMarginPresentText: '',
+      cannotDetermineMarginPresentText: '',
+      other: '',
+      otherText: '',
+      cannotDetermine: '',
+      cannotDetermineText: '',
+    });
+  }
+
+  // -----------------------------Functions of Tumor Site or  secondFormGroup --------------------------------------------------
+  private subscribeToFormChanges(): void {
+
+    this.formSubscription = this.secondFormGroup.valueChanges.subscribe(values => {
+      console.log('Form values:', values);
+    });
+
+    this.secondFormGroup.get('marginsPresent')?.valueChanges.subscribe(value => {
+      if (!value) {
+        // If the parent checkbox is not selected, disable all inner checkboxes
+        this.disableInnerCheckboxes();
+      } else {
+        // If the parent checkbox is selected, enable all inner checkboxes
+        this.enableInnerCheckboxes();
+      }
+    });
+    // Ensure the "Not specified" checkbox is always enabled
+    this.secondFormGroup.get('notSpecified')?.enable();
+  }
+  
+  private disableInnerCheckboxes(): void {
+    Object.keys(this.secondFormGroup.controls)
+      .filter(controlName => controlName !== 'marginsPresent' && controlName !== 'notSpecified')
+      .forEach(controlName => {
+        this.secondFormGroup.controls[controlName].disable();
+      });
+  }
+  
+  private enableInnerCheckboxes(): void {
+    Object.keys(this.secondFormGroup.controls)
+      .filter(controlName => controlName !== 'marginsPresent')
+      .forEach(controlName => {
+        this.secondFormGroup.controls[controlName].enable();
+      });
+  }
+
+ // Function to handle click event on "Not specified" checkbox
+ toggleAllCheckboxes(): void {
+  const notSpecifiedControl = this.secondFormGroup.get('notSpecified');
+   if (notSpecifiedControl) {
+    const notSpecifiedValue = notSpecifiedControl.value;
+     Object.keys(this.secondFormGroup.controls)
+      .filter(controlName => controlName !== 'notSpecified')
+      .forEach(controlName => {
+        const control = this.secondFormGroup.controls[controlName];
+        if (notSpecifiedValue) {
+          control.disable();
+        } else if (controlName === 'marginsPresent') {
+          control.enable(); // Enable the parent checkbox
+        }
+      });
+    if (notSpecifiedValue) {
+      this.secondFormGroup.reset({
+        notSpecified: true
+      });
+    }
+  }
+ }
+ 
+ // -----------------------------End of functions of Tumor Site or  secondFormGroup -------------------------------->>>>>>>>>>>>>>>>>
+
+
+
+  // ---------------------------- For FirstFormGroup Other specify comment  ----------------------------------------------------
   showOtherField: boolean = false;
   onRadioChange(event: MatRadioChange) {
 
@@ -129,78 +276,8 @@ export class HomeComponent implements OnInit {
     this.cdRef.detectChanges(); // Trigger change detection
   }
   
-
-  private initSubtaskState(): void {
-    const clockPositionTask = this.task.subtasks?.find(subtask => subtask.name === 'Clock position');
-    this.isClockSubtaskDisabled = !(clockPositionTask?.completed ?? true);
-
-    this.thirdFormGroup.addControl('distanceFromNipple', new FormControl(''));
-    this.thirdFormGroup.addControl('otherSpecify', new FormControl(''));
-  }
-
-  updateAllComplete(subtask: Task) {
-    subtask.completed = !subtask.completed;
-    this.allComplete = !!(this.task?.subtasks?.length && this.task.subtasks.every(t => t.completed));
   
-    if (subtask.name === 'Clock position') {
-      this.isClockSubtaskDisabled = !subtask.completed;
-    }
-  }  
-  
-  someComplete(): boolean {
-    if (!this.task.subtasks) {
-      return false;
-    }
-  
-    const clockSubtasksCompleted = (this.task.subtasks
-      .find(subtask => subtask.name === 'Clock position')
-      ?.subtasks?.some(clockSubtask => clockSubtask.completed)) || false;
-  
-    return this.task.subtasks.some(t => t.completed) || (clockSubtasksCompleted && !this.allComplete);
-  }
-
-  setAll(completed: boolean) {
-    this.allComplete = completed;
-  
-    (this.task.subtasks || []).forEach(t => {
-      t.completed = completed;
-      if (t.subtasks) {
-        t.subtasks.forEach(subtask => (subtask.completed = completed));
-      }
-      this.isClockSubtaskDisabled = !completed;
-    });
-  }
-  
-  onCheckboxChange(event: MatCheckboxChange, controlName: string): void {
-    const formControl = this.thirdFormGroup.get(controlName) as FormControl;
-    formControl.enable();
-    formControl.setValue(event.checked ? '' : null);
-  }
-
-  resetthirdFormGroup(): void {
-    this.thirdFormGroup.reset();
-    this.allComplete = false;
-    this.isClockSubtaskDisabled = true;
-    this.disableCheckboxes = true;
-  
-    (this.task.subtasks || []).forEach(subtask => {
-      subtask.completed = false;
-      if (subtask.subtasks) {
-        subtask.subtasks.forEach(subsubtask => subsubtask.completed = false);
-      }
-    });
-  }
-
-  resetAndToggleDisable(): void {
-    this.resetthirdFormGroup();
-    this.disableCheckboxes = !this.disableCheckboxes; // Toggle the disableCheckboxes flag
-    this.notSpecifiedSelected = !this.notSpecifiedSelected;
-    this.allComplete = false; // Reset the "allComplete" flag to enable the checkbox
-  }
-
-
-  
-// FourthFormGroup functions 
+// ---------------------------- For FourthFormGroup Other specify comment  -------------------------------------->>>>>>>
   showMitoticRate: boolean = false;
   onMitoticChange(event: MatRadioChange) {
     if (event.value === 'Mitotic') {
@@ -216,112 +293,88 @@ export class HomeComponent implements OnInit {
     this.cdRef.detectChanges(); // Trigger change detection
   }
 
-getPreviewValues(): string {
-    const firstStepValues = this.firstFormGroup.value;
-    const secondStepValues = this.secondFormGroup.value;
-    const thirdStepValues = this.thirdFormGroup.value; 
-    const fourthStepValues = this.fourthFormGroup.value; 
-   
-    let tumorSite = '';
-  
-    this.task?.subtasks?.forEach(subtask => {
-      if (subtask.completed && subtask.name !== 'Tumor Site (select all that apply)') {
-        if (subtask.name === 'Specify distance from nipple in Centimeters') {
-          const distance = this.thirdFormGroup?.get('distanceFromNipple')?.value;
-          tumorSite += `  - Specify distance from nipple in Centimeters: ${distance} cm\n`;
-        } else if (subtask.name === 'Other (specify)') {
-          const otherSpecifyValue = this.thirdFormGroup?.get('otherSpecify')?.value;
-          if (otherSpecifyValue) {
-            tumorSite += `  - Other (specify): ${otherSpecifyValue}\n`;
-          }
-        } else {
-          tumorSite += `  - ${subtask.name}\n`;
-  
-          if (subtask.subtasks) {
-            subtask.subtasks.forEach(clockSubtask => {
-              if (clockSubtask.completed) {
-                tumorSite += `    - ${clockSubtask.name}\n`;
-              }
-            });
-          }
-        }
-      }
-    });
 
- // Include the "Not Specified" value in the preview only if it's not disabled
-if (this.notSpecifiedSelected && !this.disableCheckboxes) {
-  tumorSite += ' - Not Specified\n';
+// ---------------------------- For FifthFormGroup Other specify comment  -------------------------------------------------------
+
+private subscribeToAllMarginsNegativeChanges(): void {
+  this.fifthFormGroup.get('allMarginsNegative')?.valueChanges.subscribe(value => {
+    if (value) {
+      this.fifthFormGroup.get('closestMarginSectionVisible')?.setValue(true);
+      this.fifthFormGroup.get('distanceMarginSectionVisible')?.setValue(true);
+    } else {
+      this.fifthFormGroup.get('closestMarginSectionVisible')?.setValue(false);
+      this.fifthFormGroup.get('distanceMarginSectionVisible')?.setValue(false);
+    }
+  });
 }
-  
-const preview =
-` Patient Details:\n` +
-`   Name: ${firstStepValues.name}\n` +
-`   Age: ${firstStepValues.age}\n` +
-`   Gender: ${firstStepValues.gender}\n` +
-`   Adress: ${firstStepValues.address}\n` +
-`   LAB Number: ${firstStepValues.labNo}\n\n` +
 
-` Specimen Details:\n` +
-`   Procedure: ${secondStepValues.procedure}\n` +
-`   Comment: ${secondStepValues.comment}\n` +
-`   Laterality: ${secondStepValues.direction}\n\n` +
-
-` Tumor Site:\n${tumorSite} \n\n` +
-
-` Malignant phyllodes Tumor:\n` +
-`   Histologic Type: ${fourthStepValues.histologic}\n` +
-`   Stromal Cellularity: ${fourthStepValues.cellularity}\n` +
-`   Stromal Atypia: ${fourthStepValues.atypia}\n` +
-`   Stromal Overgrowth: ${fourthStepValues.overGrowth}\n` +
-`   Mitotic Rate: ${fourthStepValues.mitotic === 'Mitotic' ? fourthStepValues.mitoticRate : fourthStepValues.mitotic}\n` +
-`   Histologic Tumor Border: ${fourthStepValues.tumorBorder === 'infiltrative' ? 'Infiltrative (permeative) - ' + fourthStepValues.infiltrativeExtent : fourthStepValues.tumorBorder}\n` + 
-`   Malignant Heterologous Elements: ${fourthStepValues.malignant === 'other' ? 'Other (specify) - '+ fourthStepValues.commentMalignant : fourthStepValues.malignant}\n`;
-
-
-  return preview;
+private subscribeToPhyllodesPresentChanges(): void {
+  this.fifthFormGroup.get('phyllodesPresent')?.valueChanges.subscribe(value => {
+    if (value) {
+      this.fifthFormGroup.get('phyllodesMarginSectionVisible')?.setValue(true);
+    } else {
+      this.fifthFormGroup.get('phyllodesMarginSectionVisible')?.setValue(false);
+    }
+  });
 }
-  
 
-  task: Task = {
-    name: 'Tumor Site (select all that apply)',
-    completed: false,
-    dataInput: '',
-    subtasks: [
-      { name: 'Upper outer quadrant', completed: false,  dataInput: '' },
-      { name: 'Lower outer quadrant', completed: false,  dataInput: '' },
-      { name: 'Upper inner quadrant', completed: false,  dataInput: '' },
-      { name: 'Lower inner quadrant', completed: false ,  dataInput: ''},
-      { name: 'Central', completed: false ,  dataInput: ''},
-      { name: 'Nipple', completed: false ,  dataInput: '' },
-      {
-        name: 'Clock position',
-        completed: false,
-        dataInput: '',
-        subtasks: [
-          { name: '1 o\'clock', completed: false ,  dataInput: ''},
-          { name: '2 o\'clock', completed: false ,  dataInput: ''},
-          { name: '3 o\'clock', completed: false ,  dataInput: ''},
-          { name: '4 o\'clock', completed: false ,  dataInput: ''},
-          { name: '5 o\'clock', completed: false ,  dataInput: ''},
-          { name: '6 o\'clock', completed: false ,  dataInput: ''},
-          { name: '7 o\'clock', completed: false ,  dataInput: ''},
-          { name: '8 o\'clock', completed: false ,  dataInput: ''},
-          { name: '9 o\'clock', completed: false ,  dataInput: ''},
-          { name: '10 o\'clock', completed: false ,  dataInput: ''},
-          { name: '11 o\'clock', completed: false ,  dataInput: ''},
-          { name: '12 o\'clock', completed: false ,  dataInput: ''},
-        ],
-      },
-      {
-        name: 'Specify distance from nipple in Centimeters',
-        completed: false,
-        dataInput: '', // Added dataInput to capture text input
-      },
-      {
-        name: 'Other (specify)',
-        completed: false,
-        dataInput: '', // Added dataInput to capture text input
-      },
-    ],
-  };
+
+resetChildControls(controlName: string) {
+  if (!this.fifthFormGroup.get(controlName)?.value) {
+    // Reset child controls when the parent checkbox is unselected
+    switch (controlName) {
+      case 'allMarginsNegative':
+        // Reset child controls related to 'allMarginsNegative'
+        this.fifthFormGroup.patchValue({
+          // Reset values for inner checkboxes
+          anterior: false,
+          posterior: false,
+          superiorClosest: false,
+          inferiorClosest: false,
+          medialClosest: false,
+          lateralClosest: false,
+          otherMarginClosestText: '',
+          cannotDetermineMarginClosestText: '',
+          // Reset values for distance radio buttons
+          exactDistance: '',
+          lessThan: '',
+          greaterThan: '',
+          otherDistanceText: '',
+          cannotDetermineDistanceText: ''
+        });
+        break;
+      case 'phyllodesPresent':
+        // Reset child controls related to 'phyllodesPresent'
+        this.fifthFormGroup.patchValue({
+          // Reset values for inner checkboxes
+          involvedAnteriorPresent: false,
+          involvedPosteriorPresent: false,
+          superiorPresent: false,
+          inferiorPresent: false,
+          medialPresent: false,
+          lateralPresent: false,
+          otherMarginPresentText: '',
+          cannotDetermineMarginPresentText: ''
+        });
+        break;
+      case 'other':
+        // Reset value for 'otherText' input
+        this.fifthFormGroup.patchValue({
+          otherText: ''
+        });
+        break;
+      case 'cannotDetermine':
+        // Reset value for 'cannotDetermineText' input
+        this.fifthFormGroup.patchValue({
+          cannotDetermineText: ''
+        });
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+// -------------------------------------- End of FifthFormGroup Other specify comment --------------------------------->>>>>>>>
+ 
 }

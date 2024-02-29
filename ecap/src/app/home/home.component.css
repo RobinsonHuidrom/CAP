@@ -1,3 +1,33 @@
+
+
+/* Updated CSS for more compact text and spacing */
+.tree-structure {
+  margin-bottom: 10px;
+}
+
+.tree-structure h3 {
+  margin-top: 1px;
+  padding-left: 45px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+  color: brown;
+  font-size: 15px; /* Adjust font size */
+}
+
+.tree-structure ul {
+  list-style-type: none;
+  padding-left: 40px;
+}
+
+
+.tree-structure .mat-body-1 ul{
+  font-size: 15px; /* Adjust font size */
+  color: blue;
+
+}
+
+
+
 .example-container mat-form-field + mat-form-field {
   margin-left: 8px;
 }
