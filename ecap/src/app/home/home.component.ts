@@ -1,12 +1,11 @@
-
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatStepperModule} from '@angular/material/stepper';
 import {MatRadioChange, MatRadioModule} from '@angular/material/radio';
-import {MatCheckboxChange, MatCheckboxModule} from '@angular/material/checkbox';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatSelectModule} from '@angular/material/select';
 import {MatListModule} from '@angular/material/list';
@@ -51,7 +50,6 @@ export class HomeComponent implements OnInit {
   notSpecifiedSelected = false;
 
   private formSubscription!: Subscription;
-
   
   // Define arrays for directions and distance options
   directions: { controlName: string, value: string, label: string }[] = [
@@ -254,9 +252,7 @@ export class HomeComponent implements OnInit {
  
  // -----------------------------End of functions of Tumor Site or  secondFormGroup -------------------------------->>>>>>>>>>>>>>>>>
 
-
-
-  // ---------------------------- For FirstFormGroup Other specify comment  ----------------------------------------------------
+// ---------------------------- For FirstFormGroup Other specify comment  ----------------------------------------------------
   showOtherField: boolean = false;
   onRadioChange(event: MatRadioChange) {
 
