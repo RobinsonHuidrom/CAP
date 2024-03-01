@@ -50,37 +50,6 @@ export class HomeComponent implements OnInit {
   notSpecifiedSelected = false;
 
   private formSubscription!: Subscription;
-  
-  // Define arrays for directions and distance options
-  directions: { controlName: string, value: string, label: string }[] = [
-    { controlName: 'anterior', value: 'anterior', label: 'Anterior' },
-    { controlName: 'posterior', value: 'posterior', label: 'Posterior' },
-    { controlName: 'superiorClosest', value: 'superior-closest', label: 'Superior' },
-    { controlName: 'inferiorClosest', value: 'inferior-closest', label: 'Inferior' },
-    { controlName: 'medialClosest', value: 'medial-closest', label: 'Medial' },
-    { controlName: 'lateralClosest', value: 'lateral-closest', label: 'Lateral' },
-    { controlName: 'otherMarginClosestText', value: 'other-Margin-Closest-Text', label: 'Other (specify):'  },
-    { controlName: 'cannotDetermineMarginClosestText', value: 'cannot-Determine-Margin-Closest-Text', label: 'Cannot be determined (explain):' }
-  ];
-
-  distanceOptions: { controlName: string, value: string, label: string }[] = [
-    { controlName: 'exactDistance', value: 'exact-distance', label: 'Exact distance:' },
-    { controlName: 'lessThan', value: 'less-than', label: 'Less than:' },
-    { controlName: 'greaterThan', value: 'greater-than', label: 'Greater than:' },
-    { controlName: 'otherDistanceText', value: 'other-distance-text', label: 'Other (specify):' },
-    { controlName: 'cannotDetermineDistanceText', value: 'cannot-determine-distance-text', label: 'Cannot be determined (explain):' }
-  ];
-
-  phyllodesMarginOptions: { controlName: string, value: string, label: string }[] = [
-    { controlName: 'involvedAnteriorPresent', value: 'involved-anterior-present', label: 'Anterior' },
-    { controlName: 'involvedPosteriorPresent', value: 'involved-posterior-present', label: 'Posterior' },
-    { controlName: 'superiorPresent', value: 'superior-present', label: 'Superior' },
-    { controlName: 'inferiorPresent', value: 'inferior-present', label: 'Inferior' },
-    { controlName: 'medialPresent', value: 'medial-present', label: 'Medial' },
-    { controlName: 'lateralPresent', value: 'lateral-present', label: 'Lateral' },
-    { controlName: 'otherMarginPresentText', value: 'other-Margin-Present-Text', label: 'Other (specify):'  },
-    { controlName: 'cannotDetermineMarginPresentText', value: 'cannot-Determine-Margin-Present-Text', label: 'Cannot be determined (explain):' }
-  ];
 
   constructor(private _formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {}
 
@@ -90,8 +59,7 @@ export class HomeComponent implements OnInit {
     this.initThirdFormGroup();
     this.initFourthFormGroup();
     this.initFifthFormGroup();
-    this.subscribeToAllMarginsNegativeChanges();
-    this.subscribeToPhyllodesPresentChanges(); 
+  
     this.subscribeToFormChanges();
   }
 
@@ -161,33 +129,33 @@ export class HomeComponent implements OnInit {
 
   private initFifthFormGroup(): void {
     this.fifthFormGroup = this._formBuilder.group({
-      allMarginsNegative: false,
-      anterior: false,
-      posterior: false,
-      superiorClosest: false,
-      inferiorClosest: false,
-      medialClosest: false,
-      lateralClosest: false,
-      otherMarginClosestText: '',
-      cannotDetermineMarginClosestText: '',
-      exactDistance: '',
-      lessThan: '',
-      greaterThan: '',
-      otherDistanceText: '',
-      cannotDetermineDistanceText: '',
-      phyllodesPresent: false,
-      involvedAnteriorPresent: false,
-      involvedPosteriorPresent: false,
-      superiorPresent: false,
-      inferiorPresent: false,
-      medialPresent: false,
-      lateralPresent: false,
-      otherMarginPresentText: '',
-      cannotDetermineMarginPresentText: '',
-      other: '',
-      otherText: '',
-      cannotDetermine: '',
-      cannotDetermineText: '',
+      allMarginsNegative: [false],
+      anterior: [false],
+      posterior: [false],
+      superiorClosest: [false],
+      inferiorClosest: [false],
+      medialClosest: [false],
+      lateralClosest: [false],
+      otherMarginClosestText: [''],
+      cannotDetermineMarginClosestText: [''],
+      exactDistance: [''],
+      lessThan: [''],
+      greaterThan: [''],
+      otherDistanceText: [''],
+      cannotDetermineDistanceText: [''],
+      phyllodesPresent: [false],
+      involvedAnteriorPresent: [false],
+      involvedPosteriorPresent: [false],
+      superiorPresent: [false],
+      inferiorPresent: [false],
+      medialPresent: [false],
+      lateralPresent: [false],
+      otherMarginPresentText: [''],
+      cannotDetermineMarginPresentText: [''],
+      other: [''],
+      otherText: [''],
+      cannotDetermine: [''],
+      cannotDetermineText: ['']
     });
   }
 
@@ -292,84 +260,79 @@ export class HomeComponent implements OnInit {
 
 // ---------------------------- For FifthFormGroup Other specify comment  -------------------------------------------------------
 
-private subscribeToAllMarginsNegativeChanges(): void {
-  this.fifthFormGroup.get('allMarginsNegative')?.valueChanges.subscribe(value => {
-    if (value) {
-      this.fifthFormGroup.get('closestMarginSectionVisible')?.setValue(true);
-      this.fifthFormGroup.get('distanceMarginSectionVisible')?.setValue(true);
-    } else {
-      this.fifthFormGroup.get('closestMarginSectionVisible')?.setValue(false);
-      this.fifthFormGroup.get('distanceMarginSectionVisible')?.setValue(false);
+
+resetChildControls(controlName: string): void {
+  const resetValues: { [key: string]: any } = {
+    // Define reset values for different control groups
+    allMarginsNegative: {
+      anterior: false,
+      posterior: false,
+      superiorClosest: false,
+      inferiorClosest: false,
+      medialClosest: false,
+      lateralClosest: false,
+      otherMarginClosestText: '',
+      cannotDetermineMarginClosestText: '',
+      exactDistance: '',
+      lessThan: '',
+      greaterThan: '',
+      otherDistanceText: '',
+      cannotDetermineDistanceText: ''
+    },
+    phyllodesPresent: {
+      involvedAnteriorPresent: false,
+      involvedPosteriorPresent: false,
+      superiorPresent: false,
+      inferiorPresent: false,
+      medialPresent: false,
+      lateralPresent: false,
+      otherMarginPresentText: '',
+      cannotDetermineMarginPresentText: ''
+    },
+    other: {
+      otherText: ''
+    },
+    cannotDetermine: {
+      cannotDetermineText: ''
     }
-  });
-}
+  };
 
-private subscribeToPhyllodesPresentChanges(): void {
-  this.fifthFormGroup.get('phyllodesPresent')?.valueChanges.subscribe(value => {
-    if (value) {
-      this.fifthFormGroup.get('phyllodesMarginSectionVisible')?.setValue(true);
-    } else {
-      this.fifthFormGroup.get('phyllodesMarginSectionVisible')?.setValue(false);
-    }
-  });
-}
-
-
-resetChildControls(controlName: string) {
   if (!this.fifthFormGroup.get(controlName)?.value) {
-    // Reset child controls when the parent checkbox is unselected
-    switch (controlName) {
-      case 'allMarginsNegative':
-        // Reset child controls related to 'allMarginsNegative'
-        this.fifthFormGroup.patchValue({
-          // Reset values for inner checkboxes
-          anterior: false,
-          posterior: false,
-          superiorClosest: false,
-          inferiorClosest: false,
-          medialClosest: false,
-          lateralClosest: false,
-          otherMarginClosestText: '',
-          cannotDetermineMarginClosestText: '',
-          // Reset values for distance radio buttons
-          exactDistance: '',
-          lessThan: '',
-          greaterThan: '',
-          otherDistanceText: '',
-          cannotDetermineDistanceText: ''
-        });
-        break;
-      case 'phyllodesPresent':
-        // Reset child controls related to 'phyllodesPresent'
-        this.fifthFormGroup.patchValue({
-          // Reset values for inner checkboxes
-          involvedAnteriorPresent: false,
-          involvedPosteriorPresent: false,
-          superiorPresent: false,
-          inferiorPresent: false,
-          medialPresent: false,
-          lateralPresent: false,
-          otherMarginPresentText: '',
-          cannotDetermineMarginPresentText: ''
-        });
-        break;
-      case 'other':
-        // Reset value for 'otherText' input
-        this.fifthFormGroup.patchValue({
-          otherText: ''
-        });
-        break;
-      case 'cannotDetermine':
-        // Reset value for 'cannotDetermineText' input
-        this.fifthFormGroup.patchValue({
-          cannotDetermineText: ''
-        });
-        break;
-      default:
-        break;
-    }
+    this.fifthFormGroup.patchValue(resetValues[controlName]);
   }
 }
+
+  // Define arrays for directions and distance options
+  directions: { controlName: string, value: string, label: string }[] = [
+    { controlName: 'anterior', value: 'anterior', label: 'Anterior' },
+    { controlName: 'posterior', value: 'posterior', label: 'Posterior' },
+    { controlName: 'superiorClosest', value: 'superior-closest', label: 'Superior' },
+    { controlName: 'inferiorClosest', value: 'inferior-closest', label: 'Inferior' },
+    { controlName: 'medialClosest', value: 'medial-closest', label: 'Medial' },
+    { controlName: 'lateralClosest', value: 'lateral-closest', label: 'Lateral' },
+    { controlName: 'otherMarginClosestText', value: 'other-Margin-Closest-Text', label: 'Other (specify):'  },
+    { controlName: 'cannotDetermineMarginClosestText', value: 'cannot-Determine-Margin-Closest-Text', label: 'Cannot be determined (explain):' }
+  ];
+
+  distanceOptions: { controlName: string, value: string, label: string }[] = [
+    { controlName: 'exactDistance', value: 'exact-distance', label: 'Exact distance:' },
+    { controlName: 'lessThan', value: 'less-than', label: 'Less than:' },
+    { controlName: 'greaterThan', value: 'greater-than', label: 'Greater than:' },
+    { controlName: 'otherDistanceText', value: 'other-distance-text', label: 'Other (specify):' },
+    { controlName: 'cannotDetermineDistanceText', value: 'cannot-determine-distance-text', label: 'Cannot be determined (explain):' }
+  ];
+
+  phyllodesMarginOptions: { controlName: string, value: string, label: string }[] = [
+    { controlName: 'involvedAnteriorPresent', value: 'involved-anterior-present', label: 'Anterior' },
+    { controlName: 'involvedPosteriorPresent', value: 'involved-posterior-present', label: 'Posterior' },
+    { controlName: 'superiorPresent', value: 'superior-present', label: 'Superior' },
+    { controlName: 'inferiorPresent', value: 'inferior-present', label: 'Inferior' },
+    { controlName: 'medialPresent', value: 'medial-present', label: 'Medial' },
+    { controlName: 'lateralPresent', value: 'lateral-present', label: 'Lateral' },
+    { controlName: 'otherMarginPresentText', value: 'other-Margin-Present-Text', label: 'Other (specify):'  },
+    { controlName: 'cannotDetermineMarginPresentText', value: 'cannot-Determine-Margin-Present-Text', label: 'Cannot be determined (explain):' }
+  ];
+
 
 // -------------------------------------- End of FifthFormGroup Other specify comment --------------------------------->>>>>>>>
  

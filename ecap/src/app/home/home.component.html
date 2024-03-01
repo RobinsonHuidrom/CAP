@@ -28,8 +28,8 @@
         <mat-radio-button value="Not specified"> Not specified </mat-radio-button>
       </mat-radio-group>
 
-      <div >
-        <button mat-button  class="buttonColor aqua-button" matStepperNext>Next</button>
+      <div>
+        <button mat-button class="buttonColor aqua-button" matStepperNext>Next</button>
       </div>
     </form>
   </mat-step>
@@ -240,9 +240,8 @@
     <mat-divider></mat-divider>
   
     <div>
-      <button mat-button style="background-color: rgb(16, 196, 228);" matStepperPrevious>Back</button>
-       &nbsp;
-      <button mat-button style="background-color: rgb(16, 196, 228);" matStepperNext>Next</button>
+      <button mat-button class="buttonColor aqua-button" matStepperPrevious>Back</button>
+      <button mat-button class="buttonColor aqua-button" matStepperNext>Next</button>
     </div>
   
    </form>
@@ -252,6 +251,7 @@
   <mat-step [stepControl]="fifthFormGroup">
     <form [formGroup]="fifthFormGroup">
       <div class="tree-structure">
+        <ng-template matStepLabel> MARGINS   </ng-template>
         <h2>Margins for Phyllodes Tumor</h2>
         <!-- All margins negative -->
         <ul>
@@ -277,10 +277,10 @@
           </ul>
 
           <!-- Distance from Phyllodes Tumor to Closest Margin -->
-          <h3>Distance from Phyllodes Tumor to Closest Margin (select one)</h3>
+          <h3>Distance from Phyllodes Tumor to Closest Margin (select one)</h3>                                                                     
           <ul>
             <li *ngFor="let distanceOption of distanceOptions">
-              <mat-radio-button [value]="distanceOption.value" [disabled]="!fifthFormGroup.get('allMarginsNegative')?.value">{{ distanceOption.label }}<mat-form-field><input matInput type="text" formControlName="{{ distanceOption.controlName }}"></mat-form-field></mat-radio-button>
+              <mat-radio-button [value]="distanceOption.value" [disabled]="!fifthFormGroup.get('allMarginsNegative')?.value">{{ distanceOption.label }}<input matInput type="text" formControlName="{{ distanceOption.controlName }}"></mat-radio-button>
             </li>
           </ul>
 
@@ -329,20 +329,18 @@
         </ul>
 
         <div>
-          <button mat-raised-button color="primary" matStepperNext>Next</button>
-        </div>
+          <button mat-button class="buttonColor aqua-button" matStepperPrevious>Back</button>
+          <button mat-button class="buttonColor aqua-button" matStepperNext>Next</button>
+       </div>
       </div>
     </form>
   </mat-step>
 
-
   <mat-step>
     <ng-template matStepLabel>Done</ng-template>
       
-   
    <div>
       <button mat-button class="buttonColor aqua-button" matStepperPrevious>Back</button>
-      <button mat-button class="buttonColor aqua-button" matStepperNext>Next</button>
    </div>
   </mat-step>
     
