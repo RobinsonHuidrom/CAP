@@ -1,0 +1,39 @@
+
+<div *ngIf="isLoading; else formContent">
+  <!-- Show spinner when loading -->
+  <mat-spinner diameter="50"></mat-spinner>
+</div>
+
+<ng-template #formContent>
+  <!-- Show form content when not loading -->
+  <div *ngIf="formConfig; else noFormConfig">
+    <mat-horizontal-stepper #stepper>
+      <mat-step *ngFor="let step of formConfig.steps; let i = index">
+        <ng-template matStepLabel>{{ step.label }}</ng-template>
+        <form [formGroup]="formGroups[i]">
+          <div *ngFor="let control of step.controls">
+            <div [ngSwitch]="control.type">
+              <div *ngSwitchCase="'input'">
+                <mat-form-field>
+                  <mat-label>{{ control.label }}</mat-label>
+                  <input matInput [formControl]="getControlFromGroup(formGroups[i], control.label)">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+    
+          <div>
+            <button mat-button *ngIf="i > 0" (click)="stepper.previous()">Back</button>
+            <button mat-button *ngIf="i < formConfig.steps.length - 1" (click)="stepper.next()">Next</button>
+            <button mat-button *ngIf="i === formConfig.steps.length - 1" >Save</button>
+          </div>
+    
+        </form>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </div>
+
+  <ng-template #noFormConfig>
+    <p>No form configuration provided.</p>
+  </ng-template>
+</ng-template>

@@ -1,15 +1,24 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { HomeComponent } from "./home/home.component";
+import { FormConfig } from '../assets/form.config';
+import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
+import { FormSelectionComponent } from './form-selection/form-selection.component';
+
 
 @Component({
     selector: 'app-root',
     standalone: true,
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
-    imports: [CommonModule, RouterOutlet, HomeComponent]
+    imports: [CommonModule, RouterOutlet, DynamicFormComponent, FormSelectionComponent ]
 })
 export class AppComponent {
-  title = 'eCAP';
+  selectedFormConfig: FormConfig | null = null;
+  onFormSelected(formConfig: FormConfig) {
+    this.selectedFormConfig = formConfig;
+  }
 }
+
+
+

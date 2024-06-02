@@ -1,0 +1,10 @@
+
+
+<div>
+  <select #selectElement (change)="onFormSelected(selectElement.value)">
+    <option value="" selected disabled>Please select a form</option>
+    <option *ngFor="let form of formConfigs" [value]="form.formId">{{ form.name }}</option>
+  </select>
+</div>
+
+
