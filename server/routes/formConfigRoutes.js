@@ -77,6 +77,3 @@ router.delete('/formConfigs/:id', getFormConfig, async (req, res) => {
 });
 
 module.exports = router;
-
-
-

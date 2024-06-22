@@ -12,14 +12,27 @@ app.use(cors({
 }));
 
 // Connect to MongoDB database
-mongoose.connect(process.env.MONGODB_URI); // Fix the typo here
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+  throw new Error('MONGODB_URI environment variable is not defined.');
+}
+mongoose.connect(MONGODB_URI);
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.on('error', (error) => {
+  console.error('MongoDB connection error:', error);
+  process.exit(1); // Exit on error
+});
 db.once('open', () => console.log('Connected to MongoDB'));
 
 // Define routes
 const formConfigRoutes = require('./routes/formConfigRoutes');
 app.use('/api', formConfigRoutes);
+
+// Middleware for 404 errors (optional)
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
 
 // Define route handler for the root endpoint
 app.get('/', (req, res) => {

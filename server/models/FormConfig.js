@@ -4,10 +4,31 @@
 
 const mongoose = require('mongoose');
 
+const optionSchema = new mongoose.Schema({
+  label: String,
+  value: mongoose.Schema.Types.Mixed // Allow for various value types (string, number, boolean)
+});
+
+const validationSchema = new mongoose.Schema({
+  name: String,
+  value: mongoose.Schema.Types.Mixed // Allow for various value types (string, number)
+});
+
+const conditionalLogicSchema = new mongoose.Schema({
+  action: String,
+  targets: [String],
+  condition: String,
+  value: mongoose.Schema.Types.Mixed // Allow for various value types for comparison
+});
+
 const controlSchema = new mongoose.Schema({
   type: String,
+  controlName: String,
   label: String,
-  options: [{ type: String, default: [] }]
+  options: [optionSchema],
+  validation: [validationSchema],
+  defaultValue: mongoose.Schema.Types.Mixed, // Allow for various value types
+  conditionalLogic: conditionalLogicSchema
 });
 
 const stepSchema = new mongoose.Schema({
@@ -18,19 +39,12 @@ const stepSchema = new mongoose.Schema({
 const formConfigSchema = new mongoose.Schema({
   name: String,
   steps: [stepSchema],
-  // Add the new field with an auto-incrementing unique constraint
   formId: {
     type: Number,
-    unique: true, // Ensures each form has a unique numeric ID
-    index: true, // Creates an index for efficient querying
-    auto: true // Automatically generates a unique value for each new document
+    unique: true,
+    index: true,
+    auto: true
   }
 });
 
-
 module.exports = mongoose.model('FormConfig', formConfigSchema);
-
-
-
-
-
