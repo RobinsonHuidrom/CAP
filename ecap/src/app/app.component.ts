@@ -1,7 +1,9 @@
+// app.component.ts
+
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { FormConfig } from '../assets/form.config';
+import { FormConfig } from '../assets/form-config';
 import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 import { FormSelectionComponent } from './form-selection/form-selection.component';
 
@@ -13,12 +15,11 @@ import { FormSelectionComponent } from './form-selection/form-selection.componen
     styleUrl: './app.component.css',
     imports: [CommonModule, RouterOutlet, DynamicFormComponent, FormSelectionComponent ]
 })
+
 export class AppComponent {
   selectedFormConfig: FormConfig | null = null;
+  title: any;
   onFormSelected(formConfig: FormConfig) {
     this.selectedFormConfig = formConfig;
   }
 }
-
-
-

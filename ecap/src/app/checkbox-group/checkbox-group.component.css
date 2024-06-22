@@ -1,0 +1,16 @@
+/* src/app/components/dynamic-form/checkbox-group/checkbox-group.component.css */
+
+.checkbox-group-container {
+    margin-bottom: 16px;
+  }
+  
+  .checkbox-option {
+    margin: 8px 0;
+  }
+  
+  .nested-group {
+    margin-left: 16px;
+    border-left: 2px solid #ddd;
+    padding-left: 16px;
+  }
+  

@@ -1,0 +1,15 @@
+/* src/app/components/dynamic-form/dynamic-form.component.css */
+
+form {
+    margin: 20px;
+  }
+  
+  mat-form-field {
+    width: 100%;
+    margin-top: 8px;
+  }
+  
+  button[type="submit"] {
+    margin-top: 20px;
+  }
+  

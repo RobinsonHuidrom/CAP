@@ -1,39 +1,61 @@
+<!-- src/app/components/dynamic-form/dynamic-form.component.html -->
 
-<div *ngIf="isLoading; else formContent">
-  <!-- Show spinner when loading -->
-  <mat-spinner diameter="50"></mat-spinner>
-</div>
-
-<ng-template #formContent>
-  <!-- Show form content when not loading -->
-  <div *ngIf="formConfig; else noFormConfig">
-    <mat-horizontal-stepper #stepper>
-      <mat-step *ngFor="let step of formConfig.steps; let i = index">
-        <ng-template matStepLabel>{{ step.label }}</ng-template>
-        <form [formGroup]="formGroups[i]">
-          <div *ngFor="let control of step.controls">
-            <div [ngSwitch]="control.type">
-              <div *ngSwitchCase="'input'">
-                <mat-form-field>
-                  <mat-label>{{ control.label }}</mat-label>
-                  <input matInput [formControl]="getControlFromGroup(formGroups[i], control.label)">
-                </mat-form-field>
-              </div>
+<form [formGroup]="formGroup" (ngSubmit)="onSubmit()" *ngIf="formConfig && formConfig.steps && formConfig.steps[0].controls">
+  <div *ngFor="let control of formConfig.steps[0].controls">
+    <ng-container [ngSwitch]="control.type">
+      <div *ngSwitchCase="'checkbox-group'">
+        <label>{{ control.label }}</label>
+        <div [formArrayName]="control.controlName">
+          <div *ngFor="let option of control.options; let i = index" [formGroupName]="i">
+            <mat-checkbox [formControlName]="'checked'">
+              {{ option.label || option.value }}
+            </mat-checkbox>
+            <ng-container *ngIf="option.type === 'input'">
+              <mat-form-field>
+                <mat-label>{{ option.label }}</mat-label>
+                <input matInput [formControlName]="'input'">
+              </mat-form-field>
+            </ng-container>
+            <div *ngIf="option.children && option.children.length">
+              <app-dynamic-form
+                [formConfig]="{
+                  id: i,
+                  name: option.label,
+                  formId: i,
+                  steps: [{ label: option.label, controls: option.children }]
+                }"
+              ></app-dynamic-form>
             </div>
           </div>
-    
-          <div>
-            <button mat-button *ngIf="i > 0" (click)="stepper.previous()">Back</button>
-            <button mat-button *ngIf="i < formConfig.steps.length - 1" (click)="stepper.next()">Next</button>
-            <button mat-button *ngIf="i === formConfig.steps.length - 1" >Save</button>
-          </div>
-    
-        </form>
-      </mat-step>
-    </mat-horizontal-stepper>
+        </div>
+      </div>
+
+      <div *ngSwitchCase="'checkbox'">
+        <mat-checkbox [formControlName]="control.controlName">
+          {{ control.label }}
+        </mat-checkbox>
+      </div>
+
+      <div *ngSwitchCase="'input'">
+        <mat-form-field>
+          <mat-label>{{ control.label }}</mat-label>
+          <input matInput [formControlName]="control.controlName">
+        </mat-form-field>
+      </div>
+
+      <div *ngSwitchCase="'radio-group'">
+        <app-radio-group [config]="control" [formGroup]="formGroup"></app-radio-group>
+      </div>
+
+      <div *ngSwitchCase="'checkbox-input'">
+        <app-checkbox-input [config]="formGroup.get(control.controlName)" [label]="control.label"></app-checkbox-input>
+      </div>
+
+      <ng-container *ngSwitchDefault>
+        Unsupported control type: {{ control.type }}
+      </ng-container>
+    </ng-container>
   </div>
 
-  <ng-template #noFormConfig>
-    <p>No form configuration provided.</p>
-  </ng-template>
-</ng-template>
+  <button mat-button type="submit">Submit</button>
+</form>

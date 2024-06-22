@@ -1,10 +1,12 @@
 
+// form-selection.component.ts
+
 import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
 import { FormConfigService } from '../services/form-config.service';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
-import { FormConfig } from '../../assets/form.config';
+import { FormConfig } from '../../assets/form-config';
 
 @Component({
   selector: 'app-form-selection',
@@ -53,4 +55,4 @@ export class FormSelectionComponent implements OnDestroy {
     } 
   }
 }
-  
+ 

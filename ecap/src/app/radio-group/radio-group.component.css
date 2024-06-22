@@ -1,0 +1,15 @@
+/* src/app/components/dynamic-form/radio-group/radio-group.component.css */
+
+.radio-group-container {
+    margin-bottom: 16px;
+  }
+  
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .radio-option {
+    margin: 4px 0;
+  }
+  

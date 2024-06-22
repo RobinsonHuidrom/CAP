@@ -1,0 +1,18 @@
+
+
+<!-- src/app/components/dynamic-form/checkbox-group/checkbox-group.component.html -->
+
+<div [formGroup]="formGroup">
+  <div [formArrayName]="config.controlName">
+    <label>{{ config.label }}</label>
+    <div *ngFor="let option of config.options; let i = index">
+      <mat-checkbox [formControl]="getFormControl(i)">
+        {{ option.label || option.value }}
+      </mat-checkbox>
+      <mat-form-field *ngIf="option.type === 'input'">
+        <mat-label>{{ option.label }}</mat-label>
+        <input matInput [formControl]="getFormControl(i)">  
+      </mat-form-field>
+    </div>
+  </div>
+</div>

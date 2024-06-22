@@ -1,0 +1,12 @@
+<!-- src/app/components/dynamic-form/radio-group/radio-group.component.html -->
+
+<div [formGroup]="formGroup" class="radio-group-container">
+  <label>{{ config.label }}</label>
+  <mat-radio-group [formControlName]="config.controlName" class="radio-group">
+    <div *ngFor="let option of config.options" class="radio-option">
+      <mat-radio-button [value]="option.value">
+        {{ option.label || option.value }}
+      </mat-radio-button>
+    </div>
+  </mat-radio-group>
+</div>

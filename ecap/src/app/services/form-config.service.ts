@@ -1,8 +1,9 @@
+// form-config.service.ts
 
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, shareReplay, Subject, takeUntil, throwError } from 'rxjs';
-import { FormConfig } from '../../assets/form.config';
+import { FormConfig } from '../../assets/form-config';
 
 @Injectable({
   providedIn: 'root',
@@ -37,5 +38,4 @@ export class FormConfigService implements OnDestroy {
     );
   }
 }
-
 

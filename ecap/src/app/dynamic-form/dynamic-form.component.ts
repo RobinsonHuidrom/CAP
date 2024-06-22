@@ -1,86 +1,116 @@
-
-import { FormConfig } from '../../assets/form.config';
-import { FormConfigService } from '../services/form-config.service';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input, AfterViewInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, FormArray, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatStepperModule } from '@angular/material/stepper';
-import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatSelectModule } from '@angular/material/select';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-
+import { FormConfig, FormControlConfig } from '../../assets/form-config';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group.component';
+import { RadioGroupComponent } from '../radio-group/radio-group.component';
+import { CheckboxInputComponent } from '../checkbox-input/checkbox-input.component';
 
 @Component({
   selector: 'app-dynamic-form',
   standalone: true,
-  imports: [    
-    MatStepperModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatRadioModule,
-    MatCheckboxModule,
-    MatDividerModule,
-    MatSelectModule,
-    MatListModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    CommonModule,
-    HttpClientModule
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    ReactiveFormsModule, 
+    MatCheckboxModule, 
+    MatFormFieldModule, 
+    MatInputModule, 
+    CheckboxGroupComponent, 
+    RadioGroupComponent, 
+    CheckboxInputComponent
   ],
   templateUrl: './dynamic-form.component.html',
-  styleUrl: './dynamic-form.component.css',
-  providers: [FormConfigService],
+  styleUrls: ['./dynamic-form.component.css']
 })
-
-
-export class DynamicFormComponent implements OnChanges {
+export class DynamicFormComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() formConfig: FormConfig | null = null;
-  formGroups: FormGroup[] = [];
-  isLoading = false; // Add a loading state property
+  formGroup!: FormGroup;
 
   constructor(private fb: FormBuilder) {}
 
-  ngOnChanges() {
-    if (this.formConfig) {
-      this.isLoading = true; // Set loading to true when the form is being loaded
-      this.createFormGroups(this.formConfig); // Pass the received formConfig to createFormGroups
+  ngOnInit() {}
 
-      // Simulate a delay of 3 seconds before showing the form
-      setTimeout(() => {
-        this.isLoading = false; // Set loading to false after 3 seconds
-      }, 1000);
-    }
-  }
-
-  private createFormGroups(formConfig: FormConfig) {
-    this.formGroups = [];
-    if (formConfig?.steps) {
-      formConfig.steps.forEach(step => {
-        const formGroup = this.fb.group({});
-        step.controls.forEach(control => {
-          const controlConfig = this.fb.control('');
-          if (control.type === 'input') {
-            formGroup.addControl(control.label, controlConfig);
-          }
-        });
-        this.formGroups.push(formGroup);
+  ngAfterViewInit() {
+    // Initialize form after view (and child components) are initialized
+    if(this.formGroup)
+        this.formConfig?.steps.forEach(step => {
+         this.formGroup = this.fb.group(this.buildFormControls(step.controls));
       });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['formConfig'] && this.formConfig) {
+      this.createFormGroup(this.formConfig);
     }
   }
 
-  getControlFromGroup(formGroup: FormGroup, controlName: string): FormControl {
-    const control = formGroup.get(controlName);
-    return control ? control as FormControl : new FormControl();
+  createFormGroup(formConfig: FormConfig) {
+    this.formGroup = this.fb.group(this.buildFormControls(formConfig.steps[0].controls));
+  }
+  
+  buildFormControls(controls: FormControlConfig[]): { [key: string]: any } {
+    const group: { [key: string]: any } = {};
+  
+    controls.forEach(control => {
+      if (control.type === 'checkbox-group') {
+        group[control.controlName] = this.fb.array(control.options!.map(() => this.fb.group({
+          checked: new FormControl(false),
+          input: new FormControl(control.defaultValue || '')
+        })));
+        if (control.children && control.children.length) {
+          control.children.forEach(child => {
+            group[child.controlName] = this.fb.group(this.buildFormControls(child.children || []));
+          });
+        }
+      } else if (control.type === 'checkbox') {
+        group[control.controlName] = this.fb.control(false);
+      } else if (control.type === 'input') {
+        group[control.controlName] = this.fb.control(control.defaultValue || '');
+      } else if (control.type === 'checkbox-input') {
+        group[control.controlName] = this.fb.group({
+          isChecked: new FormControl(control.defaultValue || false),
+          inputText: new FormControl('')
+        });
+      }
+    });
+  
+    return group;
+  }
+  
+  createNestedControl(control: FormControlConfig): AbstractControl {
+    if (this.hasChildren(control)) {
+      return this.fb.group(this.buildFormControls(control.children!)); // Non-null assertion
+    }
+
+    switch (control.type) {
+      case 'checkbox-group':
+        return this.fb.array(
+          control.options!.map(() => this.fb.group({
+            checked: new FormControl(false),
+            input: new FormControl(control.defaultValue || '') 
+          }))
+        );
+      case 'checkbox-input':
+        return this.fb.group({
+          isChecked: [false],
+          inputText: ['']
+        });
+      case 'checkbox':
+        return this.fb.control(false);
+      default: 
+        return this.fb.control(control.defaultValue || '');
+    }
+  }
+
+  private hasChildren(control: FormControlConfig): boolean {
+    return control.children !== undefined && control.children.length > 0;
+  }
+
+  onSubmit() {
+    console.log(this.formGroup.value);
   }
 }
