@@ -14,3 +14,7 @@
     padding-left: 16px;
   }
   
+  /* checkbox-group.component.css */
+mat-form-field {
+  width: 100%;
+}

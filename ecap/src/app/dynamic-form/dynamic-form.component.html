@@ -8,10 +8,12 @@
             <mat-checkbox [formControlName]="'checked'">
               {{ option.label || option.value }}
             </mat-checkbox>
-            <mat-form-field *ngIf="option.type === 'input' && formGroup.get(control.controlName)?.get(i.toString())?.get('checked')?.value">
-              <mat-label>{{ option.label }}</mat-label>
-              <input matInput [formControlName]="'input'">
-            </mat-form-field>
+            <div *ngIf="option.type === 'input' && formGroup.get(control.controlName)?.get(i.toString())?.get('checked')?.value">
+              <mat-form-field style="width: 100%;">
+                <mat-label>{{ option.label }}</mat-label>
+                <input matInput [formControlName]="'input'">
+              </mat-form-field>
+            </div>
             <!-- Nested form controls -->
             <div *ngIf="option.children && option.children.length">
               <app-dynamic-form
@@ -34,7 +36,7 @@
       </div>
 
       <div *ngSwitchCase="'input'">
-        <mat-form-field>
+        <mat-form-field style="width: 100%;">
           <mat-label>{{ control.label }}</mat-label>
           <input matInput [formControlName]="control.controlName">
         </mat-form-field>

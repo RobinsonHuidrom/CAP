@@ -4,3 +4,8 @@
     margin-bottom: 16px;
   }
   
+  /* checkbox-input.component.css */
+mat-form-field {
+  width: 100%;
+  display: block;
+}

@@ -3,19 +3,31 @@
 <!-- src/app/components/dynamic-form/checkbox-group/checkbox-group.component.html -->
 
 <div [formGroup]="formGroup">
-   <div [formArrayName]="config.controlName">
-     <label>{{ config.label }}</label>
-     <div *ngFor="let option of config.options; let i = index">
-       <mat-checkbox [formControl]="getCheckedControl(i)">
-         {{ option.label || option.value }}
-       </mat-checkbox>
-       <mat-form-field *ngIf="option.type === 'input' && getCheckedControl(i).value">
-         <mat-label>{{ option.label }}</mat-label>
-         <input matInput [formControl]="getInputControl(i)">
-       </mat-form-field>
-     </div>
-   </div>
- </div>
- 
+  <div [formArrayName]="config.controlName">
+    <label>{{ config.label }}</label>
+    <div *ngFor="let option of config.options; let i = index">
+      <mat-checkbox [formControl]="getCheckedControl(i)">
+        {{ option.label || option.value }}
+      </mat-checkbox>
+      <div *ngIf="option.type === 'input' && getCheckedControl(i).value">
+        <mat-form-field style="width: 100%;">
+          <mat-label>{{ option.label }}</mat-label>
+          <input matInput [formControl]="getInputControl(i)">
+        </mat-form-field>
+      </div>
+      <!-- Nested form controls -->
+      <div *ngIf="option.children && option.children.length">
+        <app-dynamic-form
+          [formConfig]="{
+            id: i,
+            name: option.label,
+            formId: i,
+            steps: [{ label: option.label, controls: option.children }]
+          }"
+        ></app-dynamic-form>
+      </div>
+    </div>
+  </div>
+</div>
 
  
