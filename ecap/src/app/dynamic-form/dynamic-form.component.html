@@ -29,6 +29,10 @@
         </div>
       </div>
 
+      <div *ngSwitchCase="'radio-group'">
+        <app-radio-group [config]="control" [formGroup]="formGroup"></app-radio-group>
+      </div>
+
       <div *ngSwitchCase="'checkbox'">
         <mat-checkbox [formControlName]="control.controlName">
           {{ control.label }}
@@ -40,10 +44,6 @@
           <mat-label>{{ control.label }}</mat-label>
           <input matInput [formControlName]="control.controlName">
         </mat-form-field>
-      </div>
-
-      <div *ngSwitchCase="'radio-group'">
-        <app-radio-group [config]="control" [formGroup]="formGroup"></app-radio-group>
       </div>
 
       <div *ngSwitchCase="'checkbox-input'">

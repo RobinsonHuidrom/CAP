@@ -66,6 +66,8 @@ export class DynamicFormComponent implements OnInit, OnChanges, AfterViewInit {
             group[child.controlName] = this.fb.group(this.buildFormControls(child.children || []));
           });
         }
+      } else if (control.type === 'radio-group') {
+        group[control.controlName] = new FormControl('');
       } else if (control.type === 'checkbox') {
         group[control.controlName] = this.fb.control(false);
       } else if (control.type === 'input') {
@@ -101,6 +103,8 @@ export class DynamicFormComponent implements OnInit, OnChanges, AfterViewInit {
         });
       case 'checkbox':
         return this.fb.control(false);
+      case 'radio-group':
+        return this.fb.control('');
       default: 
         return this.fb.control(control.defaultValue || '');
     }
