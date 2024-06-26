@@ -1,5 +1,3 @@
-<!-- src/app/components/dynamic-form/dynamic-form.component.html -->
-
 <form [formGroup]="formGroup" (ngSubmit)="onSubmit()" *ngIf="formConfig && formConfig.steps && formConfig.steps[0].controls">
   <div *ngFor="let control of formConfig.steps[0].controls">
     <ng-container [ngSwitch]="control.type">
@@ -10,12 +8,11 @@
             <mat-checkbox [formControlName]="'checked'">
               {{ option.label || option.value }}
             </mat-checkbox>
-            <ng-container *ngIf="option.type === 'input'">
-              <mat-form-field>
-                <mat-label>{{ option.label }}</mat-label>
-                <input matInput [formControlName]="'input'">
-              </mat-form-field>
-            </ng-container>
+            <mat-form-field *ngIf="option.type === 'input' && formGroup.get(control.controlName)?.get(i.toString())?.get('checked')?.value">
+              <mat-label>{{ option.label }}</mat-label>
+              <input matInput [formControlName]="'input'">
+            </mat-form-field>
+            <!-- Nested form controls -->
             <div *ngIf="option.children && option.children.length">
               <app-dynamic-form
                 [formConfig]="{

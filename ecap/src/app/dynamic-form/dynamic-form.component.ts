@@ -26,6 +26,7 @@ import { CheckboxInputComponent } from '../checkbox-input/checkbox-input.compone
   templateUrl: './dynamic-form.component.html',
   styleUrls: ['./dynamic-form.component.css']
 })
+
 export class DynamicFormComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() formConfig: FormConfig | null = null;
   formGroup!: FormGroup;
@@ -35,10 +36,9 @@ export class DynamicFormComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnInit() {}
 
   ngAfterViewInit() {
-    // Initialize form after view (and child components) are initialized
     if(this.formGroup)
-        this.formConfig?.steps.forEach(step => {
-         this.formGroup = this.fb.group(this.buildFormControls(step.controls));
+      this.formConfig?.steps.forEach(step => {
+        this.formGroup = this.fb.group(this.buildFormControls(step.controls));
       });
   }
 
@@ -54,12 +54,12 @@ export class DynamicFormComponent implements OnInit, OnChanges, AfterViewInit {
   
   buildFormControls(controls: FormControlConfig[]): { [key: string]: any } {
     const group: { [key: string]: any } = {};
-  
+    
     controls.forEach(control => {
       if (control.type === 'checkbox-group') {
-        group[control.controlName] = this.fb.array(control.options!.map(() => this.fb.group({
+        group[control.controlName] = this.fb.array(control.options!.map(option => this.fb.group({
           checked: new FormControl(false),
-          input: new FormControl(control.defaultValue || '')
+          input: new FormControl(option.defaultValue || '')
         })));
         if (control.children && control.children.length) {
           control.children.forEach(child => {
@@ -77,21 +77,21 @@ export class DynamicFormComponent implements OnInit, OnChanges, AfterViewInit {
         });
       }
     });
-  
+    
     return group;
   }
   
   createNestedControl(control: FormControlConfig): AbstractControl {
     if (this.hasChildren(control)) {
-      return this.fb.group(this.buildFormControls(control.children!)); // Non-null assertion
+      return this.fb.group(this.buildFormControls(control.children!));
     }
 
     switch (control.type) {
       case 'checkbox-group':
         return this.fb.array(
-          control.options!.map(() => this.fb.group({
+          control.options!.map(option => this.fb.group({
             checked: new FormControl(false),
-            input: new FormControl(control.defaultValue || '') 
+            input: new FormControl(option.defaultValue || '') 
           }))
         );
       case 'checkbox-input':

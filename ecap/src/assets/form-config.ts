@@ -2,6 +2,7 @@ export interface FormOption {
   label: string;
   value: any;
   type?: 'input';
+  defaultValue?: any;  // Add this line
   children?: FormControlConfig[];
 }
 

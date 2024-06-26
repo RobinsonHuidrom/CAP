@@ -37,9 +37,9 @@ export class CheckboxGroupComponent implements OnInit {
   }
 
   initFormArray() {
-    this.checkboxArray = this.fb.array(this.config.options!.map(() => this.fb.group({
+    this.checkboxArray = this.fb.array(this.config.options!.map(option => this.fb.group({
       checked: new FormControl(false),
-      input: new FormControl('')
+      input: new FormControl(option.defaultValue || '')
     })));
     this.formGroup.addControl(this.config.controlName, this.checkboxArray);
   }
@@ -48,12 +48,15 @@ export class CheckboxGroupComponent implements OnInit {
     return this.formGroup.get(this.config.controlName) as FormArray;
   }
 
-  getFormControl(index: number): FormControl {
-    const control = this.formArray.at(index);
-    return control as FormControl; 
+  getFormControl(index: number): FormGroup {
+    return this.formArray.at(index) as FormGroup;
   }
-  
-  onCheckboxChange(event: MatCheckboxChange, index: number) {
-    this.formArray.at(index).setValue(event.checked);
+
+  getCheckedControl(index: number): FormControl {
+    return this.getFormControl(index).get('checked') as FormControl;
+  }
+
+  getInputControl(index: number): FormControl {
+    return this.getFormControl(index).get('input') as FormControl;
   }
 }
